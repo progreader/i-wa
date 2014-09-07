@@ -20,6 +20,7 @@
 		04DE520319BAAC7F008EAD70 /* MMembersListService.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DE520219BAAC7F008EAD70 /* MMembersListService.m */; };
 		1E702C0A19BAF14500E2F33D /* MNewHomeResourceService.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E702C0919BAF14500E2F33D /* MNewHomeResourceService.m */; };
 		1E702C1019BB03B000E2F33D /* MRequestHomeResourceListService.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E702C0F19BB03B000E2F33D /* MRequestHomeResourceListService.m */; };
+		1EB4D6EC19BBFF5200EA2817 /* MSupportHomeResourceService.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EB4D6EB19BBFF5200EA2817 /* MSupportHomeResourceService.m */; };
 		2706261819ABF9AC00DF1253 /* MRestPasswordService.m in Sources */ = {isa = PBXBuildFile; fileRef = 2706261719ABF9AC00DF1253 /* MRestPasswordService.m */; };
 		2706261B19AC231900DF1253 /* MEditDeviceService.m in Sources */ = {isa = PBXBuildFile; fileRef = 2706261A19AC231900DF1253 /* MEditDeviceService.m */; };
 		2706261E19AC281500DF1253 /* MEditPersonService.m in Sources */ = {isa = PBXBuildFile; fileRef = 2706261D19AC281500DF1253 /* MEditPersonService.m */; };
@@ -528,6 +529,8 @@
 		1E702C0919BAF14500E2F33D /* MNewHomeResourceService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MNewHomeResourceService.m; sourceTree = "<group>"; };
 		1E702C0E19BB03B000E2F33D /* MRequestHomeResourceListService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRequestHomeResourceListService.h; sourceTree = "<group>"; };
 		1E702C0F19BB03B000E2F33D /* MRequestHomeResourceListService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRequestHomeResourceListService.m; sourceTree = "<group>"; };
+		1EB4D6EA19BBFF5200EA2817 /* MSupportHomeResourceService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSupportHomeResourceService.h; sourceTree = "<group>"; };
+		1EB4D6EB19BBFF5200EA2817 /* MSupportHomeResourceService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MSupportHomeResourceService.m; sourceTree = "<group>"; };
 		2706261619ABF9AC00DF1253 /* MRestPasswordService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRestPasswordService.h; sourceTree = "<group>"; };
 		2706261719ABF9AC00DF1253 /* MRestPasswordService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRestPasswordService.m; sourceTree = "<group>"; };
 		2706261919AC231900DF1253 /* MEditDeviceService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MEditDeviceService.h; sourceTree = "<group>"; };
@@ -1463,6 +1466,8 @@
 		270F301B195E89B10023EFD1 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				1EB4D6EA19BBFF5200EA2817 /* MSupportHomeResourceService.h */,
+				1EB4D6EB19BBFF5200EA2817 /* MSupportHomeResourceService.m */,
 				1E702C0E19BB03B000E2F33D /* MRequestHomeResourceListService.h */,
 				1E702C0F19BB03B000E2F33D /* MRequestHomeResourceListService.m */,
 				1E702C0819BAF14500E2F33D /* MNewHomeResourceService.h */,
@@ -3579,6 +3584,7 @@
 				275B3DD519A2F78A0096B5EE /* HttpQuery.m in Sources */,
 				273C48A1196428B800DC2BF1 /* SETextInput.m in Sources */,
 				273C48A9196428B800DC2BF1 /* XHViewState.m in Sources */,
+				1EB4D6EC19BBFF5200EA2817 /* MSupportHomeResourceService.m in Sources */,
 				273C48C4196428B800DC2BF1 /* XHVoiceRecordHUD.m in Sources */,
 				2762DBC6195FB8F6009C5F84 /* SDWebImageDecoder.m in Sources */,
 				273C489C196428B800DC2BF1 /* SELinkText.m in Sources */,

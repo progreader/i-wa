@@ -24,6 +24,9 @@
 #import "SGFocusImageItem.h"
 #import "MRequestHomeResourceListService.h"
 #import "UIButton+WebCache.h"
+#import "MSupportHomeResourceService.h"
+#import "MOk2DialogViewController.h"
+#import "SDWebImageManager.h"
 
 @interface MTimelineViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate, SGFocusImageFrameDelegate,ServiceCallback>
 
@@ -38,6 +41,8 @@
 @property (strong, nonatomic) MMembersViewController *membersSettingViewController;
 
 @property (strong,nonatomic) MRequestHomeResourceListService* requestHomeResourceListService;
+@property (strong,nonatomic) MSupportHomeResourceService*
+supportHomeResourceService;
 
 @end
 
@@ -103,13 +108,31 @@
     [self.view bringSubviewToFront:self.headerContainerView];
     
     self.requestHomeResourceListService = [[MRequestHomeResourceListService alloc] initWithSid:@"MRequestHomeResourceListService" andCallback:self];
+    self.supportHomeResourceService = [[MSupportHomeResourceService alloc] initWithSid:@"MSupportHomeResourceService" andCallback:self];
 }
 
 - (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid
 {
     BOOL success=[[result.data objectForKey:@"success"] intValue]==1;
     
-    if(success)
+    if([sid isEqualToString:@"MSupportHomeResourceService" ])
+    {
+        /*
+        NSString* msg=success?@"发送成功":@"发送失败";
+            
+        MOk2DialogViewController *viewController = [MOk2DialogViewController new];
+        viewController.message = msg;
+        viewController.mj_dismissDelegate = self;
+        
+        [self presentPopupViewController:viewController animationType:MJPopupViewAnimationSlideBottomBottom isBackgroundClickable:NO dismissed:^{
+            
+            if(success)
+            {
+                [self.navigationController popViewControllerAnimated:YES];
+            }
+        }];*/
+    }
+    else if(success)
     {
         NSArray* objs=[result.data objectForKey:@"objs"];
         
@@ -118,22 +141,25 @@
         for (NSDictionary* objDic in objs)
         {
             NSMutableDictionary* dic=[NSMutableDictionary dictionaryWithCapacity:10];
-                               
-            NSString* iconUrl=@"";
-            NSString* from=@"WATCH";
+            NSDictionary* createByDic=[objDic objectForKey:@"$created_by"];
+            
+            NSString* pageId=[[objDic objectForKey:@"_id"] objectForKey:@"$oid"];
+            NSString* avatarUrl=[createByDic objectForKey:@"avatar_url"];
+            NSString* from=@"";//WATCH
             NSString* actionType=@"HEART";
             NSString* replyUsers=@"";//自己，老公，女儿
             double timestamp=[[[objDic objectForKey:@"created_at"] objectForKey: @"$date"] doubleValue];
             NSString* time=[[self class] dateTimeStringWithTimeIntervalSince1970:timestamp dateTimeFormat:@"MM-dd hh:mm"];
             NSString* comment=[objDic objectForKey:@"body"];
             NSString* imgUrl=[objDic objectForKey:@"url"];
-            NSString* issupport=@"NO";
+            NSString* issupport=[[objDic objectForKey:@"stars"] count]>0?@"YES":@"NO";
             NSString* REPLY_LIST=@"";
             NSString* memberName=@"";
             
-            if(iconUrl)
+            [dic setObject:pageId forKey:@"pageId"];
+            if(avatarUrl)
             {
-                [dic setObject:iconUrl forKey:@"ICON_URL"];
+                [dic setObject:avatarUrl forKey:@"ICON_URL"];
             }
             if(from)
             {
@@ -326,12 +352,20 @@
 {
     UIButton *button = sender;
     NSMutableDictionary *dataItem = [self.timelineItemList objectAtIndex:button.tag];
-    if ([dataItem[@"IS_SUPPORT"] isEqualToString:@"YES"]) {
+    NSString* pageId=dataItem[@"pageId"];
+    if ([dataItem[@"IS_SUPPORT"] isEqualToString:@"YES"])
+    {
         dataItem[@"IS_SUPPORT"] = @"NO";
         [button setImage:[UIImage imageNamed:@"赞"] forState:UIControlStateNormal];
-    } else {
+        
+        [self.supportHomeResourceService submitSupportPageId:pageId support:NO];
+    }
+    else
+    {
         dataItem[@"IS_SUPPORT"] = @"YES";
         [button setImage:[UIImage imageNamed:@"点赞"] forState:UIControlStateNormal];
+        
+        [self.supportHomeResourceService submitSupportPageId:pageId support:YES];
     }
 }
 
@@ -339,6 +373,8 @@
 {
     MCommentDialogViewController *viewController = [MCommentDialogViewController new];
     viewController.allowsSendFace = NO;
+    viewController.allowsSendVoice=NO;
+    viewController.allowsSendMultiMedia=NO;
     viewController.allowsPanToDismissKeyboard = NO;
     viewController.mj_dismissDelegate = self;
     [self presentPopupViewController:viewController animationType:MJPopupViewAnimationSlideBottomBottom isBackgroundClickable:YES dismissed:^{
@@ -351,8 +387,8 @@
     MGalleyListViewController *viewController = [MGalleyListViewController new];
     [self.navigationController pushViewController:viewController animated:NO];
     
-    MGalleyViewController *viewController2 = [MGalleyViewController new];
-    [self.navigationController pushViewController:viewController2 animated:YES];
+    //MGalleyViewController *viewController2 = [MGalleyViewController new];
+    //[self.navigationController pushViewController:viewController2 animated:YES];
 }
 
 - (void)didOnMemberImageButtonTapped:(id)sender
@@ -435,8 +471,8 @@
     cell.memeberNameLabel.text = dataItem[@"MENBER_NAME"];
     cell.memberCommentLabel.text = dataItem[@"COMMENT"];
     NSString *iconUrl = dataItem[@"ICON_URL"];
-    [cell.memberImageButton setImage:[UIImage imageNamed:iconUrl] forState:UIControlStateNormal];
-
+    //[cell.memberImageButton setImage:[UIImage imageNamed:iconUrl] forState:UIControlStateNormal];
+    [cell.memberImageButton sd_setImageWithURL:[NSURL URLWithString:iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]] forState:UIControlStateNormal];
     
     if ([dataItem[@"FROM"] isEqualToString:@"WATCH"]) {
         [cell.locusButton setHidden:NO];
@@ -463,13 +499,14 @@
         [cell.commentImageButton setHidden:NO];
         NSString *imageUrl = dataItem[@"IMAGE_URL"];
         [cell.commentImageButton sd_setImageWithURL:[NSURL URLWithString:imageUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]] forState:UIControlStateNormal];
+        //[cell.commentImageButton setImage:[UIImage imageNamed:imageUrl] forState:UIControlStateNormal];
         
         CGRect commentImageButtonFrame = cell.commentImageButton.frame;
         commentImageButtonFrame.origin.y = y;
         cell.commentImageButton.frame = commentImageButtonFrame;
         y += 145;
     }
-    
+
     cell.timeLabel.text = dataItem[@"TIME"];
     CGRect timeLabelFrame = cell.timeLabel.frame;
     timeLabelFrame.origin.y = y;
