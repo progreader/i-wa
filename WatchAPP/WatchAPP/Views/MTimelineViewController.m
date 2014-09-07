@@ -475,7 +475,7 @@ supportHomeResourceService;
 - (void)didOnCommentImageButtonTapped:(id)sender
 {
     MGalleyListViewController *viewController = [MGalleyListViewController new];
-    [self.navigationController pushViewController:viewController animated:NO];
+    [self.navigationController pushViewController:viewController animated:YES];
     
     //MGalleyViewController *viewController2 = [MGalleyViewController new];
     //[self.navigationController pushViewController:viewController2 animated:YES];
@@ -589,7 +589,7 @@ supportHomeResourceService;
     }
     
     UIImageView* imageView=(UIImageView*)[cell.commentImageButton.superview viewWithTag:KImageViewTag];
-    [cell.commentImageButton setHidden:YES];
+    [cell.commentImageButton setImage:nil forState:UIControlStateNormal];
     
     if ([NSString checkIfEmpty:dataItem[@"IMAGE_URL"]]) {
         [imageView removeFromSuperview];
