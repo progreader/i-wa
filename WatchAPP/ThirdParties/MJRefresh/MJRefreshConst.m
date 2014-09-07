@@ -6,6 +6,7 @@
 //  Copyright (c) 2014年 itcast. All rights reserved.
 //
 
+const CGFloat MJRefreshViewTopMargin = 90.0;//normal is 0.0
 const CGFloat MJRefreshViewHeight = 64.0;
 const CGFloat MJRefreshFastAnimationDuration = 0.25;
 const CGFloat MJRefreshSlowAnimationDuration = 0.4;
