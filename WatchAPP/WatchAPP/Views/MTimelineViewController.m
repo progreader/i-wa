@@ -35,6 +35,8 @@ static const int KImageViewTag=100;
 @interface MTimelineViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate, SGFocusImageFrameDelegate,ServiceCallback>
 {
     BOOL isRefresh_;
+    BOOL isSubmitSupport_;
+    __weak UIButton* curSupportButton_;
 }
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -150,20 +152,36 @@ supportHomeResourceService;
     
     if([sid isEqualToString:@"MSupportHomeResourceService" ])
     {
-        /*
-        NSString* msg=success?@"发送成功":@"发送失败";
+        if(success)
+        {
+            id loginData=[MAppDelegate sharedAppDelegate].loginData;
+            NSString* loginUserName=[[loginData objectForKey:@"obj"] objectForKey:@"username"];
+            NSMutableDictionary *dataItem = [self.timelineItemList objectAtIndex:curSupportButton_.tag];
+            NSMutableArray *supportPersonNames = dataItem[@"supportPersonNames"];
             
-        MOk2DialogViewController *viewController = [MOk2DialogViewController new];
-        viewController.message = msg;
-        viewController.mj_dismissDelegate = self;
-        
-        [self presentPopupViewController:viewController animationType:MJPopupViewAnimationSlideBottomBottom isBackgroundClickable:NO dismissed:^{
-            
-            if(success)
+            if (!isSubmitSupport_)
             {
-                [self.navigationController popViewControllerAnimated:YES];
+                dataItem[@"IS_SUPPORT"] = @"NO";
+                [curSupportButton_ setImage:[UIImage imageNamed:@"赞"] forState:UIControlStateNormal];
+
+                if([supportPersonNames containsObject:loginUserName])
+                {
+                    [supportPersonNames removeObject:loginUserName];
+                }
             }
-        }];*/
+            else
+            {
+                dataItem[@"IS_SUPPORT"] = @"YES";
+                [curSupportButton_ setImage:[UIImage imageNamed:@"点赞"] forState:UIControlStateNormal];
+                
+                if(![supportPersonNames containsObject:loginUserName])
+                {
+                    [supportPersonNames addObject:loginUserName];
+                }
+            }
+            
+            [self.tableView reloadData];
+        }
     }
     else if(success)
     {
@@ -181,19 +199,62 @@ supportHomeResourceService;
             NSMutableDictionary* dic=[NSMutableDictionary dictionaryWithCapacity:10];
             NSDictionary* createByDic=[objDic objectForKey:@"$created_by"];
             
-            NSString* pageId=[[objDic objectForKey:@"_id"] objectForKey:@"$oid"];
+            NSString* userId=[[createByDic objectForKey:@"_id"] objectForKey:@"$oid"];
+            
             NSString* avatarUrl=[createByDic objectForKey:@"avatar_url"];
+            
+            NSString* pageId=[[objDic objectForKey:@"_id"] objectForKey:@"$oid"];
             NSString* from=@"";//WATCH
             NSString* actionType=@"HEART";
-            NSString* replyUsers=@"";//自己，老公，女儿
+            NSString* createByUserName=@"";
             double timestamp=[[[objDic objectForKey:@"created_at"] objectForKey: @"$date"] doubleValue];
             NSString* time=[[self class] dateTimeStringWithTimeIntervalSince1970:timestamp dateTimeFormat:@"MM-dd hh:mm"];
             NSString* comment=[objDic objectForKey:@"body"];
             NSString* imgUrl=[objDic objectForKey:@"url"];
-            NSString* issupport=[[objDic objectForKey:@"stars"] count]>0?@"YES":@"NO";
-            NSString* REPLY_LIST=@"";
-            NSString* memberName=@"";
             
+            NSString* REPLY_LIST=nil;
+   
+            NSMutableDictionary* memberDic=[NSMutableDictionary dictionaryWithCapacity:5];
+            NSArray* members=[[objDic objectForKey:@"$group"] objectForKey:@"members"];
+            for (NSDictionary* tempDic in members)
+            {
+                NSString* personName=[tempDic objectForKey:@"member_name"];
+                NSString* personId=[[tempDic objectForKey:@"person"] objectForKey:@"$oid"];
+                [memberDic setObject:personName forKey:personId];
+                
+                if(createByUserName.length==0 && [userId isEqualToString:personId])
+                {
+                    createByUserName=personName;
+                }
+            }
+
+            id loginData=[MAppDelegate sharedAppDelegate].loginData;
+            NSString* loginUserId=[[[loginData objectForKey:@"obj"] objectForKey:@"_id"] objectForKey:@"$oid"];
+             NSString* loginUserName=[[loginData objectForKey:@"obj"] objectForKey:@"username"];
+            
+            NSMutableArray* supportPersonNames=[NSMutableArray arrayWithCapacity:50];
+            NSString* issupport=@"NO";
+            NSArray* stars=[objDic objectForKey:@"stars"];
+            for (NSDictionary* tempDic in stars)
+            {
+                NSString* personId=[[tempDic objectForKey:@"created_by"] objectForKey:@"$oid"];
+                if([loginUserId isEqualToString:personId])
+                {
+                    issupport=@"YES";
+                }
+                
+                NSString* personName=[memberDic objectForKey:personId];
+                [supportPersonNames addObject:personName];
+            }
+
+            if(supportPersonNames)
+            {
+                [dic setObject:supportPersonNames forKey:@"supportPersonNames"];
+            }
+            if(memberDic)
+            {
+                [dic setObject:memberDic forKey:@"memberDic"];
+            }
             [dic setObject:pageId forKey:@"pageId"];
             if(avatarUrl)
             {
@@ -206,10 +267,6 @@ supportHomeResourceService;
             if(actionType)
             {
                 [dic setObject:actionType forKey:@"ACTION_TYPE"];
-            }
-            if(replyUsers)
-            {
-                [dic setObject:replyUsers forKey:@"REPLY_USERS"];
             }
             if(time)
             {
@@ -232,9 +289,9 @@ supportHomeResourceService;
             {
                 [dic setObject:REPLY_LIST forKey:@"REPLY_LIST"];
             }
-            if(memberName)
+            if(createByUserName)
             {
-                [dic setObject:memberName forKey:@"MENBER_NAME"];
+                [dic setObject:createByUserName forKey:@"MENBER_NAME"];
             }
  
             [self.timelineItemList addObject:dic];
@@ -387,21 +444,18 @@ supportHomeResourceService;
 - (void)didOnSupportButtonTapped:(id)sender
 {
     UIButton *button = sender;
+    curSupportButton_=button;
     NSMutableDictionary *dataItem = [self.timelineItemList objectAtIndex:button.tag];
     NSString* pageId=dataItem[@"pageId"];
     if ([dataItem[@"IS_SUPPORT"] isEqualToString:@"YES"])
     {
-        dataItem[@"IS_SUPPORT"] = @"NO";
-        [button setImage:[UIImage imageNamed:@"赞"] forState:UIControlStateNormal];
-        
-        [self.supportHomeResourceService submitSupportPageId:pageId support:NO];
+        isSubmitSupport_=NO;
+        [self.supportHomeResourceService submitSupportPageId:pageId support:isSubmitSupport_];
     }
     else
     {
-        dataItem[@"IS_SUPPORT"] = @"YES";
-        [button setImage:[UIImage imageNamed:@"点赞"] forState:UIControlStateNormal];
-        
-        [self.supportHomeResourceService submitSupportPageId:pageId support:YES];
+        isSubmitSupport_=YES;
+        [self.supportHomeResourceService submitSupportPageId:pageId support:isSubmitSupport_];
     }
 }
 
@@ -577,16 +631,24 @@ supportHomeResourceService;
         [replyView removeFromSuperview];
     }
     
+    CGRect cellFrame = cell.frame;
+    cellFrame.size.height = cellHeight;
+    cell.frame = cellFrame;
+    
     if ([dataItem[@"REPLY_LIST"] isKindOfClass:[NSString class]]) {
-        CGRect cellFrame = cell.frame;
-        cellFrame.size.height = cellHeight;
-        cell.frame = cellFrame;
+        
     } else {
         NSMutableArray *replyItemDataList = dataItem[@"REPLY_LIST"];
         MTimelineReplyViewController *viewController = [MTimelineReplyViewController new];
         cell.replyViewController = viewController;
-        viewController.replyUsers = dataItem[@"REPLY_USERS"];
-        viewController.actionType = dataItem[@"ACTION_TYPE"];;
+        NSString* names=@"";
+        NSArray *supportPersonNames = dataItem[@"supportPersonNames"];
+        for (NSString* name in supportPersonNames)
+        {
+            names=[names stringByAppendingFormat:@"%@ ",name];
+        }
+        viewController.replyUsers = names;
+        viewController.actionType = dataItem[@"ACTION_TYPE"];
         viewController.replyItemDataList = replyItemDataList;
         viewController.view.tag = 10000 + indexPath.row;
         [self addChildViewController:viewController];
