@@ -27,6 +27,9 @@
 #import "MSupportHomeResourceService.h"
 #import "MOk2DialogViewController.h"
 #import "SDWebImageManager.h"
+#import "UIImageView+WebCache.h"
+
+static const int KImageViewTag=100;
 
 @interface MTimelineViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate, SGFocusImageFrameDelegate,ServiceCallback>
 
@@ -492,18 +495,34 @@ supportHomeResourceService;
         y += 25;
     }
     
+    UIImageView* imageView=(UIImageView*)[cell.commentImageButton.superview viewWithTag:KImageViewTag];
+    
     if ([NSString checkIfEmpty:dataItem[@"IMAGE_URL"]]) {
         [cell.commentImageButton setHidden:YES];
+        [imageView removeFromSuperview];
         cellHeight -= 145;
     } else {
         [cell.commentImageButton setHidden:NO];
-        NSString *imageUrl = dataItem[@"IMAGE_URL"];
-        [cell.commentImageButton sd_setImageWithURL:[NSURL URLWithString:imageUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]] forState:UIControlStateNormal];
-        //[cell.commentImageButton setImage:[UIImage imageNamed:imageUrl] forState:UIControlStateNormal];
         
         CGRect commentImageButtonFrame = cell.commentImageButton.frame;
         commentImageButtonFrame.origin.y = y;
         cell.commentImageButton.frame = commentImageButtonFrame;
+        
+        if(!imageView)
+        {
+            CGRect r=cell.commentImageButton.frame;
+            imageView=[[UIImageView alloc] initWithImage:cell.commentImageButton.imageView.image];
+            imageView.contentMode=UIViewContentModeScaleAspectFill;
+            imageView.clipsToBounds=YES;
+            [cell.commentImageButton.superview addSubview:imageView];
+            imageView.frame=r;
+        }
+        
+        NSString *imageUrl = dataItem[@"IMAGE_URL"];
+        [imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
+        
+        //[cell.commentImageButton setImage:[UIImage imageNamed:imageUrl] forState:UIControlStateNormal];
+
         y += 145;
     }
 
