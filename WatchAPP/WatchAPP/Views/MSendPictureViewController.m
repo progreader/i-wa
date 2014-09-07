@@ -86,6 +86,8 @@
             if(!result.hasError)
             {
                 [self.navigationController popViewControllerAnimated:YES];
+                
+                [_delegate handleSendSuccess];
             }
         }];
 }

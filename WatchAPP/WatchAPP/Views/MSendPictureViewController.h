@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MSendDelegate.h"
 
 @interface MSendPictureViewController : MBaseViewController
 
 @property(nonatomic,strong)UIImage *pickedImage;
-
+@property (nonatomic) id<MSendDelegate> delegate;
 @end

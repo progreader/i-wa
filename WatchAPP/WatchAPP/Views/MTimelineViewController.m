@@ -28,10 +28,14 @@
 #import "MOk2DialogViewController.h"
 #import "SDWebImageManager.h"
 #import "UIImageView+WebCache.h"
+#import "MJRefresh.h"
 
 static const int KImageViewTag=100;
 
 @interface MTimelineViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate, SGFocusImageFrameDelegate,ServiceCallback>
+{
+    BOOL isRefresh_;
+}
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *headerContainerView;
@@ -85,6 +89,7 @@ supportHomeResourceService;
     
     self.timelineItemList = [[NSMutableArray alloc] init];
     
+    /*
     NSMutableArray *replyDataItemList = [[NSMutableArray alloc] init];
     [replyDataItemList addObject:[NSMutableDictionary dictionaryWithObjects:@[ @"女儿", @"爷爷拍的花好漂亮啊。", @"TEXT"] forKeys:@[ @"REPLY_USER", @"REPLY_CONTENT", @"REPLY_CONTENT_TYPE"]]];
     [replyDataItemList addObject:[NSMutableDictionary dictionaryWithObjects:@[ @"老公", @"爸爸也会拍花？", @"TEXT"] forKeys:@[ @"REPLY_USER", @"REPLY_CONTENT", @"REPLY_CONTENT_TYPE"]]];
@@ -102,6 +107,7 @@ supportHomeResourceService;
     [replyDataItemList addObject:[NSMutableDictionary dictionaryWithObjects:@[ @"自己", @"拍的不错", @"TEXT"] forKeys:@[ @"REPLY_USER", @"REPLY_CONTENT", @"REPLY_CONTENT_TYPE"]]];
     [replyDataItemList addObject:[NSMutableDictionary dictionaryWithObjects:@[ @"老公", @"嗯", @"TEXT"] forKeys:@[ @"REPLY_USER", @"REPLY_CONTENT", @"REPLY_CONTENT_TYPE"]]];
     [self.timelineItemList addObject:[NSMutableDictionary dictionaryWithObjects:@[ @"女儿.png", @"APP", @"SUPROT", @"全部", @"2小时前", @"", @"样例4.png", @"YES", replyDataItemList, @"女儿"] forKeys:@[ @"ICON_URL", @"FROM", @"ACTION_TYPE", @"REPLY_USERS", @"TIME", @"COMMENT", @"IMAGE_URL", @"IS_SUPPORT", @"REPLY_LIST", @"MENBER_NAME"]]];
+     */
     
     self.tableView.separatorColor = [UIColor clearColor];
     [self.tableView registerNib:[UINib nibWithNibName:MTimelineTableViewCellIdentifier bundle:nil] forCellReuseIdentifier:MTimelineTableViewCellIdentifier];
@@ -112,10 +118,34 @@ supportHomeResourceService;
     
     self.requestHomeResourceListService = [[MRequestHomeResourceListService alloc] initWithSid:@"MRequestHomeResourceListService" andCallback:self];
     self.supportHomeResourceService = [[MSupportHomeResourceService alloc] initWithSid:@"MSupportHomeResourceService" andCallback:self];
+    
+    [self.tableView addHeaderWithCallback:^{
+        [self requestRefresh];
+    }];
+    [self.tableView addFooterWithCallback:^{
+        [self requestMore];
+    }];
+    
+    [self performSelector:@selector(handleSendSuccess) withObject:nil afterDelay:1.0];
+}
+
+-(void)requestRefresh
+{
+    isRefresh_=YES;
+    [self.requestHomeResourceListService requestList];
+}
+
+-(void)requestMore
+{
+    isRefresh_=NO;
+    [self.requestHomeResourceListService requestList];
 }
 
 - (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid
 {
+    [self.tableView headerEndRefreshing];
+    [self.tableView footerEndRefreshing];
+    
     BOOL success=[[result.data objectForKey:@"success"] intValue]==1;
     
     if([sid isEqualToString:@"MSupportHomeResourceService" ])
@@ -137,6 +167,11 @@ supportHomeResourceService;
     }
     else if(success)
     {
+        if(isRefresh_)
+        {
+            [self.timelineItemList removeAllObjects];
+        }
+        
         NSArray* objs=[result.data objectForKey:@"objs"];
         
         NSLog(@"%@",result.data);
@@ -213,9 +248,6 @@ supportHomeResourceService;
 {
     [super viewDidAppear:animated];    
     [self.view bringSubviewToFront:self.headerContainerView];
-    
-    [self.timelineItemList removeAllObjects];
-    [self.requestHomeResourceListService requestList];
 }
 
 - (void)didReceiveMemoryWarning
@@ -336,6 +368,7 @@ supportHomeResourceService;
             case 3:
             {
                 MSendTextViewController *viewController = [MSendTextViewController new];
+                viewController.delegate=self;
                 [self.navigationController pushViewController:viewController animated:YES];
             }
                 break;
@@ -423,7 +456,7 @@ supportHomeResourceService;
     [picker dismissViewControllerAnimated:YES completion:NULL];
     MSendPictureViewController *viewController = [MSendPictureViewController new];
     viewController.pickedImage=image;
-    
+    viewController.delegate=self;
     [self.navigationController pushViewController:viewController animated:YES];
 }
 
@@ -432,6 +465,12 @@ supportHomeResourceService;
     [picker dismissViewControllerAnimated:YES completion:NULL];
     MSendPictureViewController *viewController = [MSendPictureViewController new];
     [self.navigationController pushViewController:viewController animated:YES];
+}
+
+#pragma mark - MSendDelegate
+-(void)handleSendSuccess
+{
+    [self.tableView headerBeginRefreshing];
 }
 
 #pragma mark - UITableViewDataSource
@@ -443,7 +482,7 @@ supportHomeResourceService;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    MTimelineTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:MTimelineTableViewCellIdentifier];
+    MTimelineTableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:MTimelineTableViewCellIdentifier];
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     
     cell.locusButton.tag = indexPath.row;
@@ -496,14 +535,12 @@ supportHomeResourceService;
     }
     
     UIImageView* imageView=(UIImageView*)[cell.commentImageButton.superview viewWithTag:KImageViewTag];
+    [cell.commentImageButton setHidden:YES];
     
     if ([NSString checkIfEmpty:dataItem[@"IMAGE_URL"]]) {
-        [cell.commentImageButton setHidden:YES];
         [imageView removeFromSuperview];
         cellHeight -= 145;
     } else {
-        [cell.commentImageButton setHidden:NO];
-        
         CGRect commentImageButtonFrame = cell.commentImageButton.frame;
         commentImageButtonFrame.origin.y = y;
         cell.commentImageButton.frame = commentImageButtonFrame;
@@ -516,6 +553,7 @@ supportHomeResourceService;
             imageView.clipsToBounds=YES;
             [cell.commentImageButton.superview addSubview:imageView];
             imageView.frame=r;
+            imageView.tag=KImageViewTag;
         }
         
         NSString *imageUrl = dataItem[@"IMAGE_URL"];

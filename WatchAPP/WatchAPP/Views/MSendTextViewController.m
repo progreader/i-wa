@@ -75,6 +75,8 @@
         if(success)
         {
             [self.navigationController popViewControllerAnimated:YES];
+            
+            [_delegate handleSendSuccess];
         }
     }];
 }

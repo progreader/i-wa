@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MSendDelegate.h"
 
-@interface MTimelineViewController : MBaseViewController
+@interface MTimelineViewController : MBaseViewController<MSendDelegate>
 
 @end

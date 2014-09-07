@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MSendDelegate.h"
 
 @interface MSendTextViewController : MBaseViewController
+
+@property (nonatomic) id<MSendDelegate> delegate;
 
 @end
