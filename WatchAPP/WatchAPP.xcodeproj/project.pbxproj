@@ -18,6 +18,8 @@
 		04D7635919B59C4A006AD060 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04D7635819B59C4A006AD060 /* CoreAudio.framework */; };
 		04D7635B19B5AD4F006AD060 /* amrup.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04D7635A19B5AD4F006AD060 /* amrup.mm */; };
 		04DE520319BAAC7F008EAD70 /* MMembersListService.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DE520219BAAC7F008EAD70 /* MMembersListService.m */; };
+		1E192F0619BC90570068F1A0 /* MWaitingDialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E192F0419BC90570068F1A0 /* MWaitingDialogViewController.m */; };
+		1E192F0719BC90570068F1A0 /* MWaitingDialogViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1E192F0519BC90570068F1A0 /* MWaitingDialogViewController.xib */; };
 		1E24E24B19BC4DD1008E9816 /* MJRefresh.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1E24E23B19BC4DD0008E9816 /* MJRefresh.bundle */; };
 		1E24E24C19BC4DD1008E9816 /* MJRefreshBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E24E23E19BC4DD0008E9816 /* MJRefreshBaseView.m */; };
 		1E24E24D19BC4DD1008E9816 /* MJRefreshConst.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E24E24019BC4DD0008E9816 /* MJRefreshConst.m */; };
@@ -533,6 +535,9 @@
 		04D7635A19B5AD4F006AD060 /* amrup.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = amrup.mm; sourceTree = "<group>"; };
 		04DE520119BAAC7F008EAD70 /* MMembersListService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMembersListService.h; sourceTree = "<group>"; };
 		04DE520219BAAC7F008EAD70 /* MMembersListService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMembersListService.m; sourceTree = "<group>"; };
+		1E192F0319BC90570068F1A0 /* MWaitingDialogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MWaitingDialogViewController.h; sourceTree = "<group>"; };
+		1E192F0419BC90570068F1A0 /* MWaitingDialogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MWaitingDialogViewController.m; sourceTree = "<group>"; };
+		1E192F0519BC90570068F1A0 /* MWaitingDialogViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MWaitingDialogViewController.xib; sourceTree = "<group>"; };
 		1E24E23B19BC4DD0008E9816 /* MJRefresh.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MJRefresh.bundle; sourceTree = "<group>"; };
 		1E24E23C19BC4DD0008E9816 /* MJRefresh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJRefresh.h; sourceTree = "<group>"; };
 		1E24E23D19BC4DD0008E9816 /* MJRefreshBaseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJRefreshBaseView.h; sourceTree = "<group>"; };
@@ -3258,6 +3263,9 @@
 		27BA04BC1963AA6700A04219 /* Dialogs */ = {
 			isa = PBXGroup;
 			children = (
+				1E192F0319BC90570068F1A0 /* MWaitingDialogViewController.h */,
+				1E192F0419BC90570068F1A0 /* MWaitingDialogViewController.m */,
+				1E192F0519BC90570068F1A0 /* MWaitingDialogViewController.xib */,
 				270F306D195EC0E00023EFD1 /* MOk2DialogViewController.h */,
 				270F306E195EC0E00023EFD1 /* MOk2DialogViewController.m */,
 				270F306F195EC0E00023EFD1 /* MOk2DialogViewController.xib */,
@@ -3474,6 +3482,7 @@
 				273C4906196428B800DC2BF1 /* SenderVoiceNodePlaying000@2x.png in Resources */,
 				273C4901196428B800DC2BF1 /* RecordingSignal005@2x.png in Resources */,
 				27C97859198B8A48002C6B2B /* 声音图标2.png in Resources */,
+				1E192F0719BC90570068F1A0 /* MWaitingDialogViewController.xib in Resources */,
 				273C48F6196428B800DC2BF1 /* ReceiverVoiceNodePlaying000@2x.png in Resources */,
 				273B9B6E19628D6F0026B9F2 /* MSettingTableViewCell.xib in Resources */,
 				277E98221965078400272121 /* 样例2.jpg in Resources */,
@@ -3751,6 +3760,7 @@
 				273C488F196428B800DC2BF1 /* MultiSelectedPanel.m in Sources */,
 				273C48B0196428B800DC2BF1 /* XHAlbumRichTextView.m in Sources */,
 				273C48A3196428B800DC2BF1 /* SETextMagnifierCaret.m in Sources */,
+				1E192F0619BC90570068F1A0 /* MWaitingDialogViewController.m in Sources */,
 				273B9B721962947E0026B9F2 /* MPersonalInfoSettingTableViewCell.m in Sources */,
 				275B3DD819A2F78A0096B5EE /* MXMLReader.m in Sources */,
 				273C487B196428B800DC2BF1 /* XHHTTPClient.m in Sources */,

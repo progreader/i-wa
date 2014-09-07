@@ -8,7 +8,7 @@
 
 #import "MSendTextViewController.h"
 #import "GCPlaceholderTextView.h"
-#import "MOk2DialogViewController.h"
+#import "MWaitingDialogViewController.h"
 #import "MNewHomeResourceService.h"
 
 @interface MSendTextViewController ()<ServiceCallback>
@@ -16,6 +16,8 @@
 @property (nonatomic, strong) IBOutlet GCPlaceholderTextView *textView;
 
 @property(nonatomic,strong)MNewHomeResourceService *createHomeResourceService;
+@property(nonatomic,strong)
+MWaitingDialogViewController * waitingDialogViewController;
 
 @end
 
@@ -58,27 +60,35 @@
     NSString* content=self.textView.text;
     
     [self.createHomeResourceService requestHomeResourceNewByUpImageData:nil content:content];
+    
+    self.waitingDialogViewController = [MWaitingDialogViewController new];
+    self.waitingDialogViewController.message = @"正在发送，请稍候...";
+    self.waitingDialogViewController.mj_dismissDelegate = self;
+    
+    [self presentPopupViewController:self.waitingDialogViewController animationType:MJPopupViewAnimationSlideBottomBottom isBackgroundClickable:NO dismissed:^{
+    }];
 }
 
 - (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid
 {
     BOOL success=[[result.data objectForKey:@"success"] intValue]==1;
     
-    NSString* msg=success?@"发送成功":@"发送失败";
+    NSString* message=success?@"发送成功":@"发送失败";
     
-    MOk2DialogViewController *viewController = [MOk2DialogViewController new];
-    viewController.message = msg;
-    viewController.mj_dismissDelegate = self;
+    [self.waitingDialogViewController setWaitingMessage:message];
     
-    [self presentPopupViewController:viewController animationType:MJPopupViewAnimationSlideBottomBottom isBackgroundClickable:NO dismissed:^{
-        
-        if(success)
-        {
-            [self.navigationController popViewControllerAnimated:YES];
-            
-            [_delegate handleSendSuccess];
-        }
-    }];
+    if(!result.hasError)
+    {
+        [self performSelector:@selector(popSelf) withObject:nil afterDelay:1.0];
+    }
+}
+
+-(void)popSelf
+{
+    [self.waitingDialogViewController closePopView:nil];
+    [self.navigationController popViewControllerAnimated:YES];
+    
+    [_delegate handleSendSuccess];
 }
 
 @end

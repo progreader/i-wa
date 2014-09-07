@@ -9,7 +9,7 @@
 #import "MSendPictureViewController.h"
 #import "GCPlaceholderTextView.h"
 #import "MPhotoPickerDialogViewController.h"
-#import "MOk2DialogViewController.h"
+#import "MWaitingDialogViewController.h"
 #import "MNewHomeResourceService.h"
 #import <MobileCoreServices/UTCoreTypes.h>
 
@@ -19,6 +19,8 @@
 @property (nonatomic, strong) IBOutlet UIButton *pickButton;
 
 @property(nonatomic,strong)MNewHomeResourceService *createHomeResourceService;
+@property(nonatomic,strong)
+MWaitingDialogViewController * waitingDialogViewController;
 
 @end
 
@@ -66,30 +68,38 @@
     }
     
     [self.createHomeResourceService requestHomeResourceNewByUpImageData:imageData content:content];
+    
+    self.waitingDialogViewController = [MWaitingDialogViewController new];
+    self.waitingDialogViewController.message = @"正在发送，请稍候...";
+    self.waitingDialogViewController.mj_dismissDelegate = self;
+    
+    [self presentPopupViewController:self.waitingDialogViewController animationType:MJPopupViewAnimationSlideBottomBottom isBackgroundClickable:NO dismissed:^{
+    }];
 }
 
 - (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid
 {
-    NSString* msg=@"发送成功";
+    NSString* message=@"发送成功";
     
     if(result.hasError)
     {
-        msg=@"发送失败";
+        message=@"发送失败";
     }
     
-    MOk2DialogViewController *viewController = [MOk2DialogViewController new];
-    viewController.message = msg;
-    viewController.mj_dismissDelegate = self;
+   [self.waitingDialogViewController setWaitingMessage:message];
     
-    [self presentPopupViewController:viewController animationType:MJPopupViewAnimationSlideBottomBottom isBackgroundClickable:NO dismissed:^{
-            
-            if(!result.hasError)
-            {
-                [self.navigationController popViewControllerAnimated:YES];
-                
-                [_delegate handleSendSuccess];
-            }
-        }];
+    if(!result.hasError)
+    {
+        [self performSelector:@selector(popSelf) withObject:nil afterDelay:1.0];
+    }
+}
+
+-(void)popSelf
+{
+    [self.waitingDialogViewController closePopView:nil];
+    [self.navigationController popViewControllerAnimated:YES];
+    
+    [_delegate handleSendSuccess];
 }
 
 - (IBAction)didOnAddHeaderButtonTapped:(id)sender
