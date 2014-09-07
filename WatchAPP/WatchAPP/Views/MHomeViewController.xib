@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+    <dependencies>
+        <deployment defaultVersion="1552" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MHomeViewController">
+            <connections>
+                <outlet property="alertButton" destination="2AB-4A-I4l" id="uin-qe-DNe"/>
+                <outlet property="homeButton" destination="9Ua-qd-cRZ" id="KHK-xp-XeG"/>
+                <outlet property="locusButton" destination="Ipo-Tt-gQi" id="1Xy-U2-g40"/>
+                <outlet property="reportButton" destination="aeg-i1-Zli" id="cC3-hc-dOF"/>
+                <outlet property="settingButton" destination="x5q-HH-6l2" id="EM0-zE-hbJ"/>
+                <outlet property="tabbarContainerImageView" destination="qJL-qm-9sM" id="dIg-rb-NTo"/>
+                <outlet property="tabbarContainerView" destination="IrB-6F-ddP" id="fC5-yh-vAg"/>
+                <outlet property="view" destination="iN0-l3-epB" id="ghO-PQ-Whx"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" id="IrB-6F-ddP">
+                    <rect key="frame" x="0.0" y="519" width="320" height="50"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" alpha="0.64000000953674285" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="添加腕表背景" id="Mm3-w5-Jsa">
+                            <rect key="frame" x="0.0" y="1" width="320" height="48"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        </imageView>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAB_BG_要实现半透明毛玻璃效果" id="qJL-qm-9sM">
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
+                        <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="aeg-i1-Zli">
+                            <rect key="frame" x="0.0" y="0.0" width="64" height="49"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
+                            <inset key="contentEdgeInsets" minX="3" minY="0.0" maxX="3" maxY="6"/>
+                            <inset key="titleEdgeInsets" minX="-73" minY="35" maxX="17" maxY="0.0"/>
+                            <inset key="imageEdgeInsets" minX="13" minY="-2" maxX="13" maxY="12"/>
+                            <state key="normal" title="监测" image="报告">
+                                <color key="titleColor" red="0.8980392814" green="0.8980392814" blue="0.8980392814" alpha="1" colorSpace="deviceRGB"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <state key="selected" image="报告_当前状态">
+                                <color key="titleColor" red="0.98823535439999999" green="0.46274513010000001" blue="0.050980396570000003" alpha="1" colorSpace="deviceRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="didOnReportButtonTapped:" destination="-1" eventType="touchUpInside" id="tJ2-KP-EhL"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Ipo-Tt-gQi">
+                            <rect key="frame" x="128" y="0.0" width="64" height="49"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
+                            <inset key="titleEdgeInsets" minX="-67" minY="30" maxX="19" maxY="0.0"/>
+                            <inset key="imageEdgeInsets" minX="13" minY="-3" maxX="13" maxY="17"/>
+                            <state key="normal" title="轨迹" image="轨迹">
+                                <color key="titleColor" red="0.8980392814" green="0.8980392814" blue="0.8980392814" alpha="1" colorSpace="deviceRGB"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <state key="selected" image="轨迹_当前状态">
+                                <color key="titleColor" red="0.98823535439999999" green="0.46274513010000001" blue="0.050980396570000003" alpha="1" colorSpace="deviceRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="didOnLocusButtonTapped:" destination="-1" eventType="touchUpInside" id="T4z-fF-wwC"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="2AB-4A-I4l">
+                            <rect key="frame" x="192" y="0.0" width="64" height="49"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
+                            <inset key="titleEdgeInsets" minX="-68" minY="30" maxX="20" maxY="0.0"/>
+                            <inset key="imageEdgeInsets" minX="13" minY="-2" maxX="13" maxY="17"/>
+                            <state key="normal" title="提醒" image="提醒">
+                                <color key="titleColor" red="0.8980392814" green="0.8980392814" blue="0.8980392814" alpha="1" colorSpace="deviceRGB"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <state key="selected" image="提醒_当前状态">
+                                <color key="titleColor" red="0.98823535439999999" green="0.46274513010000001" blue="0.050980396570000003" alpha="1" colorSpace="deviceRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="didOnAlertButtonTapped:" destination="-1" eventType="touchUpInside" id="Jbx-Bm-LJK"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="x5q-HH-6l2">
+                            <rect key="frame" x="256" y="0.0" width="64" height="49"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
+                            <inset key="titleEdgeInsets" minX="-68" minY="30" maxX="20" maxY="0.0"/>
+                            <inset key="imageEdgeInsets" minX="13" minY="-2" maxX="13" maxY="17"/>
+                            <state key="normal" title="设置" image="设置">
+                                <color key="titleColor" red="0.8980392814" green="0.8980392814" blue="0.8980392814" alpha="1" colorSpace="deviceRGB"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <state key="selected" image="设置_当前状态">
+                                <color key="titleColor" red="0.98823535439999999" green="0.46274513010000001" blue="0.050980396570000003" alpha="1" colorSpace="deviceRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="didOnSettingButtonTapped:" destination="-1" eventType="touchUpInside" id="ZQy-FR-0R7"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="9Ua-qd-cRZ">
+                            <rect key="frame" x="64" y="0.0" width="64" height="49"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="12"/>
+                            <inset key="titleEdgeInsets" minX="-57" minY="30" maxX="15" maxY="0.0"/>
+                            <inset key="imageEdgeInsets" minX="17" minY="1" maxX="18" maxY="18"/>
+                            <state key="normal" title="家庭圈" image="家庭圈">
+                                <color key="titleColor" red="0.89803928136825562" green="0.89803928136825562" blue="0.89803928136825562" alpha="1" colorSpace="deviceRGB"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <state key="selected" image="家庭圈_当前状态">
+                                <color key="titleColor" red="0.98823535439999999" green="0.46274513010000001" blue="0.050980396570000003" alpha="1" colorSpace="deviceRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="didOnHomeButtonTapped:" destination="-1" eventType="touchUpInside" id="0zF-Pe-dPd"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="TAB_BG_要实现半透明毛玻璃效果" width="6" height="49"/>
+        <image name="家庭圈" width="66" height="66"/>
+        <image name="家庭圈_当前状态" width="66" height="66"/>
+        <image name="报告" width="66" height="66"/>
+        <image name="报告_当前状态" width="66" height="66"/>
+        <image name="提醒" width="66" height="66"/>
+        <image name="提醒_当前状态" width="66" height="66"/>
+        <image name="添加腕表背景" width="20" height="20"/>
+        <image name="设置" width="66" height="66"/>
+        <image name="设置_当前状态" width="66" height="66"/>
+        <image name="轨迹" width="66" height="66"/>
+        <image name="轨迹_当前状态" width="66" height="66"/>
+    </resources>
+</document>
