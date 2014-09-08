@@ -2,7 +2,7 @@
 //  MMessageService.m
 //  WatchAPP
 //
-//  Created by wwk  on 14-9-5.消息服务类实现文件
+//  Created by wangweike
 //  Copyright (c) 2014年 mSquare. All rights reserved.
 //
 

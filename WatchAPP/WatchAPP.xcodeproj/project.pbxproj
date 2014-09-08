@@ -18,6 +18,7 @@
 		04D7635919B59C4A006AD060 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04D7635819B59C4A006AD060 /* CoreAudio.framework */; };
 		04D7635B19B5AD4F006AD060 /* amrup.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04D7635A19B5AD4F006AD060 /* amrup.mm */; };
 		04DE520319BAAC7F008EAD70 /* MMembersListService.m in Sources */ = {isa = PBXBuildFile; fileRef = 04DE520219BAAC7F008EAD70 /* MMembersListService.m */; };
+		1E16644B19BD8406007EF941 /* MRequesPictureListService.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E16644A19BD8406007EF941 /* MRequesPictureListService.m */; };
 		1E192F0619BC90570068F1A0 /* MWaitingDialogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E192F0419BC90570068F1A0 /* MWaitingDialogViewController.m */; };
 		1E192F0719BC90570068F1A0 /* MWaitingDialogViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1E192F0519BC90570068F1A0 /* MWaitingDialogViewController.xib */; };
 		1E24E24B19BC4DD1008E9816 /* MJRefresh.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1E24E23B19BC4DD0008E9816 /* MJRefresh.bundle */; };
@@ -535,6 +536,8 @@
 		04D7635A19B5AD4F006AD060 /* amrup.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = amrup.mm; sourceTree = "<group>"; };
 		04DE520119BAAC7F008EAD70 /* MMembersListService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMembersListService.h; sourceTree = "<group>"; };
 		04DE520219BAAC7F008EAD70 /* MMembersListService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMembersListService.m; sourceTree = "<group>"; };
+		1E16644919BD8406007EF941 /* MRequesPictureListService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRequesPictureListService.h; sourceTree = "<group>"; };
+		1E16644A19BD8406007EF941 /* MRequesPictureListService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRequesPictureListService.m; sourceTree = "<group>"; };
 		1E192F0319BC90570068F1A0 /* MWaitingDialogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MWaitingDialogViewController.h; sourceTree = "<group>"; };
 		1E192F0419BC90570068F1A0 /* MWaitingDialogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MWaitingDialogViewController.m; sourceTree = "<group>"; };
 		1E192F0519BC90570068F1A0 /* MWaitingDialogViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MWaitingDialogViewController.xib; sourceTree = "<group>"; };
@@ -1519,6 +1522,8 @@
 		270F301B195E89B10023EFD1 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				1E16644919BD8406007EF941 /* MRequesPictureListService.h */,
+				1E16644A19BD8406007EF941 /* MRequesPictureListService.m */,
 				1EB4D6EA19BBFF5200EA2817 /* MSupportHomeResourceService.h */,
 				1EB4D6EB19BBFF5200EA2817 /* MSupportHomeResourceService.m */,
 				1E702C0E19BB03B000E2F33D /* MRequestHomeResourceListService.h */,
@@ -3619,6 +3624,7 @@
 				273C4886196428B800DC2BF1 /* XHEmotionManager.m in Sources */,
 				273C45B81963E5D600DC2BF1 /* MAddAlertViewController.m in Sources */,
 				270F305C195EBDA60023EFD1 /* IQUIView+IQKeyboardToolbar.m in Sources */,
+				1E16644B19BD8406007EF941 /* MRequesPictureListService.m in Sources */,
 				273C48C2196428B800DC2BF1 /* XHMessageInputView.m in Sources */,
 				277E97DC1964DF1700272121 /* GCPlaceholderTextView.m in Sources */,
 				273C4848196428B800DC2BF1 /* NSString+XHMD5.m in Sources */,

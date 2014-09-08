@@ -2,7 +2,7 @@
 //  MRequestMessageList.m
 //  WatchAPP
 //
-//  Created by wwk  on 14-9-5.
+//  Created by wangweike
 //  Copyright (c) 2014年 mSquare. All rights reserved.
 //
 

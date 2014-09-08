@@ -12,13 +12,15 @@
 #import "MGalleyPictureViewController.h"
 #import "UIImageView+WebCache.h"
 #import "MApi.h"
+#import "MRequesPictureListService.h"
 
 static const int KCountPerRow=4;
 
-@interface MGalleyViewController ()
+@interface MGalleyViewController ()<ServiceCallback>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *galleyDataItemList;
+@property (strong, nonatomic) MRequesPictureListService *requesPictureListService;
 
 @end
 
@@ -42,10 +44,23 @@ static const int KCountPerRow=4;
 ;
     [self.tableView registerNib:[UINib nibWithNibName:MGalleyTableViewCellIdentifier bundle:nil] forCellReuseIdentifier:MGalleyTableViewCellIdentifier];
     
+    self.requesPictureListService = [[MRequesPictureListService alloc] initWithSid:@"MRequestHomeResourceListService" andCallback:self];
+    
+    [self.requesPictureListService requestListWithPersonId:self.personId];
+    
     for (int i=0; i<10; i++)
     {
         id iconUrl=@"/media/page/540842e3bf483c53727f45e0/1410006951.jpg";
         [self.galleyDataItemList addObject:iconUrl];
+    }
+}
+
+- (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid
+{
+    BOOL success=[result.data[@"success"] intValue]==1;
+    if(success)
+    {
+        
     }
 }
 

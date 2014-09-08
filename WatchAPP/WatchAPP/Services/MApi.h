@@ -41,6 +41,6 @@
 + (void)setBaseUrl:(NSString *)baseUrl;
 + (void)sethasShowedNetworkAlert:(BOOL)hasAlert;
 
-//added by wwk 0906
+//added by wangweike 0906
 - (void)postWithPath: (NSString *)path andQuery: (HttpQuery *)query constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block;
 @end

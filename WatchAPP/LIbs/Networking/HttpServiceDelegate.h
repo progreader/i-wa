@@ -34,7 +34,7 @@
 - (void)postWithPath:(NSString *)path andQuery:(HttpQuery *)query andCallback:(NSObject<HttpServiceCallback> *)callback forSid:(NSString *)sid;
 - (void)postWithPath:(NSString *)path andQuery:(HttpQuery *)query andAttachments:(NSDictionary *)attachments andCallback:(NSObject<HttpServiceCallback> *) callback forSid:(NSString *)sid;
 - (void)setMaxConcurrentOperationsCount:(int)count;
-//added by wwk 0906
+//added by wangweike 0906
 - (void)postWithPath:(NSString *)path andQuery:(HttpQuery *)query constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block andCallback:(NSObject<HttpServiceCallback>*)callback forSid:(NSString *)sid;
 
 @end

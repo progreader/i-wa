@@ -8,6 +8,6 @@
 
 #import "MApi.h"
 
-@interface MRequestHomeResourceListService : MApi
--(void) requestList;
+@interface MRequesPictureListService : MApi
+-(void) requestListWithPersonId:(NSString*)personId;
 @end

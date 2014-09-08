@@ -105,6 +105,8 @@
     id personId=memberdata[@"person"][@"$oid"];
     
     MGalleyViewController *viewController = [MGalleyViewController new];
+    viewController.personId=personId;
+    viewController.personName=membername;
     [self.navigationController pushViewController:viewController animated:YES];
 }
 
