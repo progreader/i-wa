@@ -12,12 +12,16 @@
 #import "MSendMessageConfirmDialogViewController.h"
 #import "MSendPictureViewController.h"
 #import "MSendTextViewController.h"
+#import "MMembersListService.h"
+#import "UIImageView+WebCache.h"
 
-@interface MGalleyListViewController ()
+@interface MGalleyListViewController ()<ServiceCallback>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *galleyDataItemList;
 
+@property(strong,nonatomic) MMembersListService *membersListService;
+@property (strong, nonatomic) id members;
 
 @end
 
@@ -39,6 +43,24 @@
     
     self.tableView.separatorColor = [UIColor clearColor];
     [self.tableView registerNib:[UINib nibWithNibName:MGalleyListTableViewCellIdentifier bundle:nil] forCellReuseIdentifier:MGalleyListTableViewCellIdentifier];
+    
+    id loginData=[MAppDelegate sharedAppDelegate].loginData;
+    //self.members=loginData[@"$group"][@"members"];
+    
+    NSString * groupId=loginData[@"obj"][@"group"][@"$oid"];
+    self.membersListService=[[MMembersListService alloc]initWithSid:@"MMembersListService" andCallback:self];
+    [self.membersListService requestHomeMembersListByUserID:groupId];
+}
+
+- (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid
+{
+    BOOL success=[result.data[@"success"] intValue]==1;
+    if(success)
+    {
+        self.members=result.data[@"obj"][@"members"];
+        
+        [self.tableView reloadData];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -51,26 +73,19 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 2;
+    return [self.members count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     MGalleyListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:MGalleyListTableViewCellIdentifier];
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
-    if (0 == indexPath.row) {
-//        [cell.dayLabel setHidden:YES];
-//        [cell.monthLabel setHidden:YES];
-//        [cell.contentLabel setHidden:YES];
-        cell.monthTextLabel.text = @"8";
-        [cell.galleyImageView setImage:[UIImage imageNamed:@"老公相册1"]];
-    } else {
-//        [cell.dayLabel setHidden:NO];
-//        [cell.monthLabel setHidden:NO];
-//        [cell.contentLabel setHidden:NO];
-        cell.monthTextLabel.text = @"7";
-        [cell.galleyImageView setImage:[UIImage imageNamed:@"老公相册2"]];
-    }
+    id memberdata=self.members[indexPath.row];
+    id membername=memberdata[@"member_name"];
+    id iconUrl=memberdata[@"$person"][@"avatar_url"];
+    
+    cell.monthTextLabel.text = membername;
+    [cell.galleyImageView sd_setImageWithURL:[NSURL URLWithString:iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
     
     return cell;
 }
@@ -85,6 +100,10 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    id memberdata=self.members[indexPath.row];
+    id membername=memberdata[@"member_name"];
+    id iconUrl=memberdata[@"$person"][@"avatar_url"];
+    
     MGalleyViewController *viewController = [MGalleyViewController new];
     [self.navigationController pushViewController:viewController animated:YES];
 }
