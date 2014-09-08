@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface MGalleyPictureViewController : MBaseViewController
-
+@property (strong, nonatomic) NSString* iconUrl;
 @end

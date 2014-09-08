@@ -102,7 +102,7 @@
 {
     id memberdata=self.members[indexPath.row];
     id membername=memberdata[@"member_name"];
-    id iconUrl=memberdata[@"$person"][@"avatar_url"];
+    id personId=memberdata[@"person"][@"$oid"];
     
     MGalleyViewController *viewController = [MGalleyViewController new];
     [self.navigationController pushViewController:viewController animated:YES];

@@ -9,9 +9,11 @@
 #import "MGalleyPictureViewController.h"
 #import "MSavePictureDialogViewController.h"
 #import "MOk2DialogViewController.h"
+#import "UIImageView+WebCache.h"
+#import "MApi.h"
 
 @interface MGalleyPictureViewController ()
-
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @end
 
 @implementation MGalleyPictureViewController
@@ -29,6 +31,8 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:self.iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
 }
 
 - (void)didReceiveMemoryWarning

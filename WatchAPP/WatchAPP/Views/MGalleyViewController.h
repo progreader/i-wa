@@ -10,4 +10,7 @@
 
 @interface MGalleyViewController : MBaseViewController
 
+@property (strong, nonatomic) NSString *personId;
+@property (strong, nonatomic) NSString *personName;
+
 @end

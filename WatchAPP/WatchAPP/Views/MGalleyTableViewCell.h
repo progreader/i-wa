@@ -12,6 +12,9 @@ static NSString *const MGalleyTableViewCellIdentifier = @"MGalleyTableViewCell";
 
 @interface MGalleyTableViewCell : UITableViewCell
 
-@property (weak, nonatomic) IBOutlet UIImageView *galleyImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView0;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView1;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView2;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView3;
 
 @end
