@@ -15,16 +15,21 @@
 #import "lame.h"
 #import "IQKeyboardManager.h"
 #import "MUploadMessageService.h"
-#import "MDownloadMessageService.h"
 #import  "MRequestMessageList.h"
 #import "amrdl.h"
-@interface MChatViewController ()<AVAudioPlayerDelegate,AVAudioSessionDelegate,ServiceCallback>
+#import "XHMessageTableViewCell.h"
+#import "XHVoiceCommonHelper.h"
+#import "MRequestNewPageService.h"
+#import "MRequestPageListService.h"
+@interface MChatViewController ()<XHMessageTableViewCellDelegate,AVAudioPlayerDelegate,AVAudioSessionDelegate,ServiceCallback>
 
 @property (nonatomic, strong) NSArray *emotionManagers;
 @property (nonatomic, retain) AVAudioPlayer *player;
 @property (nonatomic, strong) IBOutlet UILabel *chatTitleLabel;
 @property(nonatomic,strong)MUploadMessageService *uploadMessageService;
-@property(nonatomic,strong)MDownloadMessageService *downloadMessageService;
+@property(nonatomic,strong)MRequestMessageList *requestMessageList;
+@property(nonatomic,strong)MRequestNewPageService *requestNewPageService;
+@property(nonatomic,strong)MRequestPageListService *requestPageListService;
 @property(nonatomic,strong)NSString *wavPath;
 @end
 
@@ -33,45 +38,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     self.messageSender = @"WatchAPP";
     self.chatTitleLabel.text = self.chatTitle;
+    self.title=self.chatTitle;
     
     //谷少鹏 0905 初始化消息服务类
     self.uploadMessageService = [[MUploadMessageService alloc] initWithSid:@"MUploadMessageService" andCallback:self];
-    self.downloadMessageService=[[MDownloadMessageService alloc] initWithSid:@"MDownloadMessageService" andCallback:self];
-//    NSMutableArray *emotionManagers = [NSMutableArray array];
-//    for (NSInteger i = 0; i < 1; i ++) {
-//        XHEmotionManager *emotionManager = [[XHEmotionManager alloc] init];
-//        emotionManager.emotionName = [NSString stringWithFormat:@"表情%ld", (long)i];
-//        NSMutableArray *emotions = [NSMutableArray array];
-//        for (NSInteger j = 0; j < 16; j ++) {
-//            XHEmotion *emotion = [[XHEmotion alloc] init];
-//            NSString *imageName = [NSString stringWithFormat:@"section%ld_emotion%ld.gif", (long)i , (long)j % 16];
-//            emotion.emotionPath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"section%ld_emotion%ld.gif", (long)i , (long)j % 16] ofType:@""];
-//            emotion.emotionConverPhoto = [UIImage imageNamed:imageName];
-//            [emotions addObject:emotion];
-//        }
-//        emotionManager.emotions = emotions;
-//        
-//        [emotionManagers addObject:emotionManager];
-//    }
-//    
-//    self.emotionManagers = emotionManagers;
-//    [self.emotionManagerView reloadData];
-//    
-//    
-//    // 添加第三方接入数据
-//    NSMutableArray *shareMenuItems = [NSMutableArray array];
-//    NSArray *plugIcons = @[@"sharemore_pic", @"sharemore_video", @"sharemore_location", @"sharemore_myfav"];
-//    NSArray *plugTitle = @[@"照片", @"拍摄", @"位置", @"我的收藏"];
-//    for (NSString *plugIcon in plugIcons) {
-//        XHShareMenuItem *shareMenuItem = [[XHShareMenuItem alloc] initWithNormalIconImage:[UIImage imageNamed:plugIcon] title:[plugTitle objectAtIndex:[plugIcons indexOfObject:plugIcon]]];
-//        [shareMenuItems addObject:shareMenuItem];
-//    }
-//    self.shareMenuItems = shareMenuItems;
-//    [self.shareMenuView reloadData];
-    
+    self.requestMessageList=[[MRequestMessageList alloc] initWithSid:@"MRequestMessageList" andCallback:self];
+    self.requestNewPageService=[[MRequestNewPageService alloc] initWithSid:@"MRequestNewPageService" andCallback:self];
+    self.requestPageListService=[[MRequestPageListService alloc]initWithSid:@"MRequestPageListService" andCallback:self];
     AVAudioSession *session = [AVAudioSession sharedInstance];
     NSError *sessionError;
     [session setCategory:AVAudioSessionCategoryPlayAndRecord error:&sessionError];
@@ -83,8 +59,7 @@
     
     UInt32 audioRouteOverride = kAudioSessionOverrideAudioRoute_Speaker;
     AudioSessionSetProperty (kAudioSessionProperty_OverrideAudioRoute,sizeof (audioRouteOverride),&audioRouteOverride);
-    
-    self.player = [[AVAudioPlayer alloc]init];
+    [self footerBeginRefreshing];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -109,17 +84,6 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-//谷少鹏 0905 测试接收语音
--(IBAction)didRecevieButtonTapped:(id)sender
-{
-    
-    [self.downloadMessageService requestMessageByID:@"5409a3a3bf483c7ca0cf2358"];
-}
--(IBAction)didPlayVoice:(id)sender{
-
-    [self.player initWithContentsOfURL:[NSURL URLWithString:self.wavPath] error:nil];
-    [self.player play];
-}
 #pragma mark - XHMessageTableViewCell delegate
 
 - (void)multiMediaMessageDidSelectedOnMessage:(id<XHMessageModel>)message atIndexPath:(NSIndexPath *)indexPath onMessageTableViewCell:(XHMessageTableViewCell *)messageTableViewCell {
@@ -138,18 +102,35 @@
         case XHBubbleMessageMediaTypeVoice:
         {
             DLog(@"message : %@", message.voicePath);
-            
-            NSString *filepath = [NSString stringWithFormat:@"%@.mp3", message.voicePath];
-            NSError *playerError;
-            AVAudioPlayer *audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:[[NSURL alloc] initFileURLWithPath:filepath] error:&playerError];
-            self.player = audioPlayer;
-            self.player.volume = 1.0f;
-            if (self.player == nil)
-            {
-                NSLog(@"ERror creating player: %@", [playerError description]);
+
+            NSString *voicePath=message.voicePath;
+            NSString *voiceUrl=message.voiceUrl;
+           
+            if(voicePath==nil){
+                voicePath=[self getVoicePathAmrFileName:[voiceUrl lastPathComponent]];
+                
+                if(![XHVoiceCommonHelper fileExistsAtPath:[voicePath stringByAppendingPathExtension:@"wav"]]){
+                    [self convertAmr2WavByUrl:voiceUrl SavePath:voicePath];
+                }
+                voicePath=[voicePath stringByAppendingPathExtension:@"wav"];
             }
+            if(self.player==nil){
+                 self.player = [[AVAudioPlayer alloc]initWithContentsOfURL:[NSURL URLWithString:voicePath] error:nil];
+            }
+            else
+            {
+                if([self.player isPlaying])
+                {
+                    [self.player stop];
+                }
+                [self.player initWithContentsOfURL:[NSURL URLWithString:voicePath] error:nil];
+            }
+           
+            self.player.volume = 1.0f;
+           
             [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategorySoloAmbient error: nil];
             self.player.delegate = self;
+            
             [self.player play];
             
             [messageTableViewCell.messageBubbleView.animationVoiceImageView startAnimating];
@@ -211,6 +192,15 @@
 - (BOOL)shouldLoadMoreMessagesScrollToTop {
     return YES;
 }
+-(void)loadMoreMessagesScrollTotop{
+    self.loadingMoreMessage=YES;
+    if([self.memberDataItem[@"TYPE"] isEqualToString:@"MEMBER"]){
+       [self.requestMessageList requestMessageListByPage:[NSNumber numberWithInt:1]];
+    }
+    else if([self.memberDataItem[@"TYPE"] isEqualToString:@"GROUP"] ){
+        [self.requestPageListService requestPageListByPage:[NSNumber numberWithInt:1]];
+    }
+}
 
 - (void)didSendText:(NSString *)text fromSender:(NSString *)sender onDate:(NSDate *)date
 {
@@ -238,17 +228,94 @@
 
 - (void)didSendVoice:(NSString *)voicePath voiceDuration:(NSString*)voiceDuration fromSender:(NSString *)sender onDate:(NSDate *)date
 {
-    XHMessage *voiceMessage = [[XHMessage alloc] initWithVoicePath:voicePath voiceUrl:nil voiceDuration:voiceDuration sender:sender timestamp:date];
-    voiceMessage.bubbleMessageType = XHBubbleMessageTypeReceiving;
-    voiceMessage.avator = [UIImage imageNamed:@"头像"];
+    NSString *wavPath=[[voicePath stringByDeletingPathExtension] stringByAppendingPathExtension:@"wav"];
+    XHMessage *voiceMessage = [[XHMessage alloc] initWithVoicePath:wavPath voiceUrl:nil voiceDuration:voiceDuration sender:sender timestamp:date];
+    voiceMessage.bubbleMessageType = XHBubbleMessageTypeSending;
+//    voiceMessage.avator = [UIImage imageNamed:@"头像"];
+    NSString *avatarUrl=[MAppDelegate sharedAppDelegate].loginData[@"obj"][@"avatar_url"];
+    voiceMessage.avatorUrl = [[MRequestMessageList getBaseUrl] stringByAppendingString:avatarUrl];
     [self addMessage:voiceMessage];
     
     //谷少鹏 0905 将amr文件上传到服务器*****
-    [self.uploadMessageService requestMessageNewByUpfile:[voicePath stringByAppendingPathExtension:@"amr"] recipient:@"540358f9bf483c14eb11280d"];//admin:53e73319bf483c42f016e2fb //53fc11f0bf483c562a67b9d1
-    //*******************************
+    if([self.memberDataItem[@"TYPE"] isEqualToString:@"MEMBER"]){
+        [self.uploadMessageService requestMessageNewByUpfile:voicePath recipient:self.memberDataItem[@"OID"]];
+    }
+    else if([self.memberDataItem[@"TYPE"] isEqualToString:@"GROUP"] ){
+        [self.requestNewPageService requestNewPageByUpfile:voicePath subject:@"组语音"] ;
+    }
+
     [self finishSendMessageWithBubbleMessageType:XHBubbleMessageMediaTypeVoice];
 }
-
+//谷少鹏0907将服务器上获取的语音加到语音列表
+-(void) addMessageFromServer:(NSArray *)messages{
+    NSMutableArray *messageArray=[[NSMutableArray alloc]init];
+    NSString *loginOID=[MAppDelegate sharedAppDelegate].loginData[@"obj"][@"_id"][@"$oid"];
+    NSString *memberOID=self.memberDataItem[@"OID"];
+    for (int i=messages.count-1; i>-1; i--) {
+        NSDictionary *message=messages[i];
+        NSString *messageCls=message[@"_cls"];
+        NSInteger mediaType=[message[@"media_type"] integerValue];
+        
+        BOOL isAmrFile=NO;
+        if([messageCls isEqualToString:@"Message.MediaMessage"] && 1==mediaType) isAmrFile=YES;
+        if([messageCls isEqualToString:@"Page.MediaPage"] && 0==mediaType) isAmrFile=YES;
+        if(isAmrFile==NO) continue;
+        NSString *extend=[message[@"url"] pathExtension];
+        if([extend isEqualToString:@"amr"]==NO) continue;
+        NSString *amrUrl= [[MRequestMessageList getBaseUrl] stringByAppendingString:message[@"url"]];
+        NSInteger amrLength=[message[@"media_length"] integerValue];
+        NSString *voiceDuration=[[NSString alloc] initWithFormat:@"%d",(amrLength/1000)];
+        double dateLong=[message[@"created_at"][@"$date"] doubleValue]/1000-8*60*60;
+        NSDate *sendDate=[[NSDate alloc] initWithTimeIntervalSince1970:dateLong];
+        NSString *avatarUrl=nil;
+        XHMessage *voiceMessage=[[XHMessage alloc]initWithVoicePath:nil voiceUrl:amrUrl voiceDuration:voiceDuration sender:@"home" timestamp:sendDate];
+        
+        //用户语音的处理
+        if([self.memberDataItem[@"TYPE"] isEqualToString:@"MEMBER"]){
+            BOOL recipient_deleted=[message[@"recipient_deleted"] boolValue];
+            BOOL sender_deleted=[message[@"sender_deleted"] boolValue];
+            if(recipient_deleted || sender_deleted) continue;
+            NSString *senderOID=message[@"sender"][@"$oid"];
+            NSString *recipientOID=message[@"recipient"][@"$oid"];
+            if([senderOID isEqualToString:loginOID]){
+                if([recipientOID isEqualToString:memberOID]){
+                    voiceMessage.bubbleMessageType = XHBubbleMessageTypeSending;
+                    avatarUrl=message[@"$sender"][@"avatar_url"];
+                }
+                else continue;
+            }
+            else if([senderOID isEqualToString:memberOID])
+            {
+                if([recipientOID isEqualToString:loginOID]){
+                    voiceMessage.bubbleMessageType = XHBubbleMessageTypeReceiving;
+                    avatarUrl=message[@"$recipient"][@"avatar_url"];
+                }else continue;
+                
+            }else continue;
+        //群语音的处理
+        }else if([self.memberDataItem[@"TYPE"] isEqualToString:@"GROUP"]){
+            NSString *createdBy=message[@"created_by"][@"$oid"];
+            if([createdBy isEqualToString:loginOID]){
+                voiceMessage.bubbleMessageType = XHBubbleMessageTypeSending;
+            }else{
+                voiceMessage.bubbleMessageType = XHBubbleMessageTypeReceiving;
+            }
+            avatarUrl=message[@"$created_by"][@"avatar_url"];
+        }
+        avatarUrl=[[MRequestMessageList getBaseUrl] stringByAppendingString:avatarUrl];
+        NSData *imageData=[[NSData alloc]initWithContentsOfURL:[NSURL URLWithString:avatarUrl]];
+        UIImage *avatarImage=[[UIImage alloc]initWithData:imageData];
+        voiceMessage.avator=avatarImage;
+        [messageArray addObject:voiceMessage];
+    }
+    [self.messages removeAllObjects];
+    [self.messageTableView reloadData];
+    [self insertOldMessages:messageArray];
+    self.loadingMoreMessage=NO;
+    [self footerEndRefreshing];
+    
+    
+}
 - (void)didSendEmotion:(NSString *)emotionPath fromSender:(NSString *)sender onDate:(NSDate *)date
 {
     XHMessage *emotionMessage = [[XHMessage alloc] initWithEmotionPath:emotionPath sender:sender timestamp:date];
@@ -289,7 +356,7 @@
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
-
+    NSLog(@"播放完成");
 }
 
 //谷少鹏 0905 消息服务回调
@@ -298,26 +365,42 @@
     if ([sid isEqualToString:@"MUploadMessageService"]) {
           NSLog(@"%@", result.data);
     }
-    else if([sid isEqualToString:@"MDownloadMessageService"]){
-        NSString *amrUrl =[[MDownloadMessageService getBaseUrl] stringByAppendingString:result.data[@"obj"][@"url"]];
-        NSData *amrData=[NSData dataWithContentsOfURL:[NSURL URLWithString:amrUrl]];
-        NSString *amrPath=[[self getVoicePath] stringByAppendingPathExtension:@"amr"];
-        [amrData writeToFile:amrPath atomically:NO];
-        self.wavPath=[[self getVoicePath] stringByAppendingPathExtension:@"wav"];
-        [amrdl amrToWav:amrPath savePath:self.wavPath];
-        
-//        NSLog(@"%@", amrUrl);
+    else if([sid isEqualToString:@"MRequestMessageList"]){
+        NSArray *messageList=result.data[@"objs"];
+        [self addMessageFromServer:messageList];
+    }
+    else if([sid isEqualToString:@"MRequestNewPageService"]){
+        NSLog(@"%@", result.data);
+    }
+    else if([sid isEqualToString:@"MRequestPageListService"]){
+        NSArray *messageList=result.data[@"objs"];
+        [self addMessageFromServer:messageList];
     }
 }
-- (NSString *)getVoicePath {
-    NSString *recorderPath = nil;
-    NSDate *now = [NSDate date];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"yy-MMMM-dd";
-    recorderPath = [[NSString alloc] initWithFormat:@"%@/Documents/", NSHomeDirectory()];
-    dateFormatter.dateFormat = @"yyyy-MM-dd-hh-mm-ss";
-    recorderPath = [recorderPath stringByAppendingFormat:@"%@-MySound", [dateFormatter stringFromDate:now]];
-//    recorderPath=[recorderPath stringByAppendingPathExtension:@"wav"];
-    return recorderPath;
+
+-(NSString *)getVoicePathAmrFileName:(NSString *)amrFileName{
+    NSString *voicePath=[[NSString alloc] initWithFormat:@"%@/Documents/", NSHomeDirectory()];
+    voicePath=[voicePath stringByAppendingPathComponent:self.memberDataItem[@"OID"]];
+     BOOL isDir=YES;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:voicePath isDirectory:&isDir] == NO) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:voicePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    NSString *voiceFileName=[amrFileName stringByDeletingPathExtension];
+    voicePath=[voicePath stringByAppendingPathComponent:voiceFileName];
+    return voicePath;
+}
+-(BOOL)convertAmr2WavByUrl:(NSString *)amrUrl SavePath:(NSString *)path{
+    NSData *amrData=[NSData dataWithContentsOfURL:[NSURL URLWithString:amrUrl]];
+    NSString *amrPath=[path stringByAppendingPathExtension:@"amr"];
+    NSString *floderPath=[path stringByDeletingLastPathComponent];
+    BOOL result=NO;
+    BOOL isDir=YES;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:floderPath isDirectory:&isDir] == NO) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:floderPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    [amrData writeToFile:amrPath atomically:NO];
+    result= ([amrdl amrToWav:amrPath savePath:[path stringByAppendingPathExtension:@"wav"]]);
+
+    return result;
 }
 @end

@@ -175,6 +175,7 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
 
 - (void)configureMessageBubbleViewWithMessage:(id <XHMessageModel>)message {
     XHBubbleMessageMediaType currentMediaType = message.messageMediaType;
+    
     for (UIGestureRecognizer *gesTureRecognizer in self.messageBubbleView.bubbleImageView.gestureRecognizers) {
         [self.messageBubbleView.bubbleImageView removeGestureRecognizer:gesTureRecognizer];
     }
@@ -192,7 +193,7 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
         case XHBubbleMessageMediaTypeText:
         case XHBubbleMessageMediaTypeVoice: {
             self.messageBubbleView.voiceDurationLabel.text = [NSString stringWithFormat:@"%@\'\'", message.voiceDuration];
-//            break;
+            //            break;
         }
         case XHBubbleMessageMediaTypeEmotion: {
             UITapGestureRecognizer *tapGestureRecognizer;
@@ -209,6 +210,7 @@ static const CGFloat kXHBubbleMessageViewPadding = 8;
             break;
     }
     [self.messageBubbleView configureCellWithMessage:message];
+    
 }
 
 #pragma mark - Gestures

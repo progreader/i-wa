@@ -9,5 +9,5 @@
 #import "MApi.h"
 
 @interface MRequestMessageList : MApi
--(void) requestMessageList;
+-(void) requestMessageListByPage:(NSNumber *)page;
 @end

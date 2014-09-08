@@ -10,9 +10,11 @@
 
 @implementation MRequestMessageList
 static NSString *PATH = @"/api/message/";
--(void) requestMessageList{
+-(void) requestMessageListByPage:(NSNumber *)page{
     HttpQuery *query = [self newQuery];
-    [self getWithPath:[PATH stringByAppendingString:@"list"] andQuery:query];
+    [query addParam:@"page" andValue:page];
+    NSString *requestPath=[PATH stringByAppendingString:@"list"];
+    [self getWithPath:requestPath andQuery:query];
     NSLog(@"获取信息列表");
     
 }

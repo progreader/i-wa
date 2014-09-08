@@ -10,11 +10,13 @@
 #import "MChatMembersTableViewCell.h"
 #import "MChatViewController.h"
 #import "MMembersListService.h"
+#import "UIImageView+WebCache.h"
 @interface MChatMembersViewController ()<ServiceCallback>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *memberDataItemList;
 @property(strong,nonatomic) MMembersListService *membersListService;
+
 @end
 
 @implementation MChatMembersViewController
@@ -33,46 +35,49 @@
     [super viewDidLoad];
 
     [self.tableView registerNib:[UINib nibWithNibName:MChatMembersTableViewCellIdentifier bundle:nil] forCellReuseIdentifier:MChatMembersTableViewCellIdentifier];
-    
+   
+    NSString *groupId= [MAppDelegate sharedAppDelegate].loginData[@"obj"][@"$group"][@"_id"][@"$oid"];
     //谷少鹏 0906 通过服务获取家庭圈成员列表
-    NSString * userID=[MAppDelegate sharedAppDelegate].loginData[@"obj"][@"_id"][@"$oid"];
     self.membersListService=[[MMembersListService alloc]initWithSid:@"MMembersListService" andCallback:self];
-    [self.membersListService requestHomeMembersListByUserID:userID];
+    
+    [self.membersListService requestGroupInfoById:groupId];
+//    [self.membersListService requestHomeInfo];
 }
+
 //谷少鹏 0905 调用后台服务回调 获取用户列表数据成功后更新tableview
 - (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid
 {
     if ([sid isEqualToString:@"MMembersListService"]) {
+       
+        NSString *groupID= [MAppDelegate sharedAppDelegate].loginData[@"obj"][@"$group"][@"_id"][@"$oid"];
+        NSString *loginOID=[MAppDelegate sharedAppDelegate].loginData[@"obj"][@"_id"][@"$oid"];
+        NSString *groupName=@"群语音";
+        NSArray *members=result.data[@"obj"][@"members"];
+        
         self.memberDataItemList = [[NSMutableArray alloc] init];
-        NSMutableDictionary *memberDataItem = [[NSMutableDictionary alloc] init];
-        [memberDataItem setObject:@"MEMBER" forKey:@"TYPE"];
-        [memberDataItem setObject:@"***" forKey:@"IMEI"];
-        [memberDataItem setObject:@"姐姐" forKey:@"NAME"];
-        [memberDataItem setObject:@"" forKey:@"USERNAME"];
-        [memberDataItem setObject:[NSString stringWithFormat:@"APP%d", 1] forKey:@"SHORT_NAME"];
-        [memberDataItem setObject:@"" forKey:@"IMAGE_URL"];
-        [self.memberDataItemList addObject: memberDataItem];
+        for(int i=0;i<members.count;i++){
+            NSDictionary *member=members[i][@"$person"];
+            NSString *memberID=member[@"_id"][@"$oid"];
+            if([memberID isEqualToString:loginOID]) continue;
+            NSString *memberName=member[@"nickname"];
+            NSString *avatarUrl=[[MMembersListService getBaseUrl] stringByAppendingString:member[@"avatar_url"]];
+            
+            NSMutableDictionary *memberDataItem = [[NSMutableDictionary alloc] init];
+            [memberDataItem setObject:@"MEMBER" forKey:@"TYPE"];
+            [memberDataItem setObject:memberID forKey:@"OID"];
+            [memberDataItem setObject:memberName forKey:@"NAME"];
+            [memberDataItem setObject:avatarUrl forKey:@"IMAGE_URL"];
+            [self.memberDataItemList addObject: memberDataItem];
+        }
+        NSMutableDictionary *groupDataItem = [[NSMutableDictionary alloc] init];
+        [groupDataItem setObject:@"GROUP" forKey:@"TYPE"];
+        [groupDataItem setObject:groupID forKey:@"OID"];
+        [groupDataItem setObject:groupName forKey:@"NAME"];
+        [groupDataItem setObject:@"home.png" forKey:@"IMAGE_URL"];
         
-        memberDataItem = [[NSMutableDictionary alloc] init];
-        [memberDataItem setObject:@"MEMBER" forKey:@"TYPE"];
-        [memberDataItem setObject:@"***" forKey:@"IMEI"];
-        [memberDataItem setObject:@"腕表-老爸" forKey:@"NAME"];
-        [memberDataItem setObject:@"" forKey:@"USERNAME"];
-        [memberDataItem setObject:[NSString stringWithFormat:@"APP%d", 1] forKey:@"SHORT_NAME"];
-        [memberDataItem setObject:@"" forKey:@"IMAGE_URL"];
-        [self.memberDataItemList addObject: memberDataItem];
-        
-        memberDataItem = [[NSMutableDictionary alloc] init];
-        [memberDataItem setObject:@"MEMBER" forKey:@"TYPE"];
-        [memberDataItem setObject:@"***" forKey:@"IMEI"];
-        [memberDataItem setObject:@"群语音" forKey:@"NAME"];
-        [memberDataItem setObject:@"" forKey:@"USERNAME"];
-        [memberDataItem setObject:[NSString stringWithFormat:@"APP%d", 1] forKey:@"SHORT_NAME"];
-        [memberDataItem setObject:@"" forKey:@"IMAGE_URL"];
-        [self.memberDataItemList addObject: memberDataItem];
-        
+        [self.memberDataItemList addObject: groupDataItem];
+
         [self.tableView reloadData];
-        NSLog(@"%@", result.data);
     }
 }
 
@@ -94,7 +99,13 @@
     MChatMembersTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:MChatMembersTableViewCellIdentifier];
     NSMutableDictionary *memberItem = [self.memberDataItemList objectAtIndex:indexPath.row];
     cell.nameLabel.text = [NSString stringWithFormat:@"%@", memberItem[@"NAME"]];
-    
+    NSString *imageURL=memberItem[@"IMAGE_URL"];
+    if([memberItem[@"TYPE"] isEqualToString:@"MEMBER"]){
+        [cell.headerImageView sd_setImageWithURL:[NSURL URLWithString:imageURL]];
+    }
+    else if([memberItem[@"TYPE"] isEqualToString:@"GROUP"]){
+        [cell.headerImageView setImage:[UIImage imageNamed:imageURL]];
+    }
     return cell;
 }
 
@@ -110,12 +121,18 @@
 {
     NSMutableDictionary *memberDataItem = self.memberDataItemList[indexPath.row];
     MChatViewController *viewController = [MChatViewController new];
+    viewController.memberDataItem=memberDataItem;
     viewController.allowsSendFace = NO;
     viewController.chatTitle = memberDataItem[@"NAME"];
     viewController.allowsPanToDismissKeyboard = NO;
-    if (1 == indexPath.row || 2 == indexPath.row) {
-        viewController.isOnlyAllowVoiceInput = YES;
-    }
+ 
+//谷少鹏 0906 所有情况下均为只允许发送语音
+//    if (1 == indexPath.row || 2 == indexPath.row) {
+//        viewController.isOnlyAllowVoiceInput = YES;
+//    }
+     viewController.isOnlyAllowVoiceInput=YES;
+    
+    
     [self.navigationController pushViewController:viewController animated:YES];
 }
 

@@ -12,4 +12,5 @@
 @interface MChatViewController : XHMessageTableViewController
 
 @property (strong, nonatomic) NSString *chatTitle;
+
 @end

@@ -9,5 +9,6 @@
 #import "MApi.h"
 
 @interface MMembersListService : MApi
--(void) requestHomeMembersListByUserID:(NSString *)userID;
+-(void) requestHomeInfo;
+-(void) requestGroupInfoById:(NSString *)groupID;
 @end

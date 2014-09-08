@@ -49,7 +49,7 @@
     
     NSString * groupId=loginData[@"obj"][@"group"][@"$oid"];
     self.membersListService=[[MMembersListService alloc]initWithSid:@"MMembersListService" andCallback:self];
-    [self.membersListService requestHomeMembersListByUserID:groupId];
+    [self.membersListService requestGroupInfoById:groupId];
 }
 
 - (void)callbackWithResult:(ServiceResult *)result forSid:(NSString *)sid

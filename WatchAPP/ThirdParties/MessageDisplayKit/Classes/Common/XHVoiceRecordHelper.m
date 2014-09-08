@@ -21,6 +21,7 @@
 }
 
 @property (nonatomic, copy, readwrite) NSString *recordPath;
+@property (nonatomic, copy, readwrite) NSString *amrPath;
 @property (nonatomic, readwrite) NSTimeInterval currentTimeInterval;
 
 @property (nonatomic, strong) AVAudioRecorder *recorder;
@@ -137,7 +138,8 @@
     [recordSetting setValue:[NSNumber numberWithInt:16] forKey:AVLinearPCMBitDepthKey];
     //*****************************
     
-    self.recordPath = path;
+    self.recordPath = [path stringByAppendingPathExtension:@"wav"];
+    self.amrPath=[path stringByAppendingPathExtension:@"amr"];
     
     error = nil;
     
@@ -146,7 +148,7 @@
     } else {
         //谷少鹏 20140904 写入wav文件时，路径增加wav扩展名
         //        _recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL fileURLWithPath:self.recordPath] settings:recordSetting error:&error];
-        _recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL fileURLWithPath:[self.recordPath stringByAppendingPathExtension:@"wav"]] settings:recordSetting error:&error];
+        _recorder = [[AVAudioRecorder alloc] initWithURL:[NSURL fileURLWithPath:self.recordPath] settings:recordSetting error:&error];
         //****************************************************
         _recorder.delegate = self;
         [_recorder prepareToRecord];
@@ -184,11 +186,12 @@
 }
 
 - (void)stopRecordingWithStopRecorderCompletion:(XHStopRecorderCompletion)stopRecorderCompletion {
-    [self getVoiceDuration:_recordPath];
-    
     _isPause = NO;
     [self stopBackgroundTask];
     [self stopRecord];
+    [self getVoiceDuration:_recordPath];
+    
+
     dispatch_async(dispatch_get_main_queue(), stopRecorderCompletion);
 }
 
@@ -261,9 +264,9 @@
 }
 
 - (void)getVoiceDuration:(NSString*)recordPath {
-    AVAudioPlayer *play = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:recordPath] error:nil];
-    DLog(@"时长:%f", play.duration);
-    self.recordDuration = [NSString stringWithFormat:@"%.1f", play.duration];
+    AVAudioPlayer *playLength = [[AVAudioPlayer alloc]initWithContentsOfURL:[NSURL URLWithString:recordPath] error:nil];
+    DLog(@"时长:%f", playLength.duration);
+    self.recordDuration = [NSString stringWithFormat:@"%.1f", playLength.duration];
 }
 
 @end

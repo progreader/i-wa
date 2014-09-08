@@ -9,10 +9,16 @@
 #import "MMembersListService.h"
 
 @implementation MMembersListService
-static NSString *PATH = @"/api/group/";
--(void) requestHomeMembersListByUserID:(NSString *)userID{
-    HttpQuery *query = [self newQuery];
-    [self getWithPath:[PATH stringByAppendingString:userID] andQuery:query];
+static NSString *PATH = @"/api/person/self";
+static NSString *PATH2 = @"/api/group/";
+-(void) requestHomeInfo{
+//    HttpQuery *query = [self newQuery];
+    [self getWithPath:PATH andQuery:nil];
     NSLog(@"获取信息列表");
+}
+-(void) requestGroupInfoById:(NSString *)groupID{
+    [self getWithPath:[PATH2 stringByAppendingString:groupID ] andQuery:nil];
+    NSLog(@"获取信息列表");
+
 }
 @end

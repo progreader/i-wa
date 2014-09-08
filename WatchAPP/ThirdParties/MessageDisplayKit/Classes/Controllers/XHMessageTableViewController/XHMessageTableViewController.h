@@ -129,6 +129,15 @@
  */
 - (void)loadMoreMessagesScrollTotop;
 
+/**
+ *  开始下拉刷新。
+ */
+-(void) footerBeginRefreshing;
+/**
+ *  结束下拉刷新。
+ */
+-(void) footerEndRefreshing;
+
 @end
 
 @protocol XHMessageTableViewControllerDataSource <NSObject>
@@ -214,6 +223,8 @@
  */
 @property (nonatomic, assign) XHMessageInputViewStyle inputViewStyle;
 
+//用户数据
+@property(strong,nonatomic) NSDictionary *memberDataItem;
 #pragma mark - DataSource Change
 /**
  *  添加一条新的消息

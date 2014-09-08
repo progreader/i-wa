@@ -1,19 +1,18 @@
 //
-//  MMessageService.m
+//  MNewPageService.m
 //  WatchAPP
 //
-//  Created by 谷少鹏  on 14-9-5.消息服务类实现文件
+//  Created by mac  on 14-9-8.
 //  Copyright (c) 2014年 mSquare. All rights reserved.
 //
 
-#import "MUploadMessageService.h"
+#import "MRequestNewPageService.h"
 
-@implementation MUploadMessageService
-// PATH
-static NSString *PATH = @"/api/message/new";
+@implementation MRequestNewPageService
 
-- (void)requestMessageNewByUpfile:(NSString *)upfile recipient:(NSString *)recipient{
-    
+static NSString *PATH = @"/api/page/new";
+
+- (void)requestNewPageByUpfile:(NSString *)upfile subject:(NSString *)subject{
     NSString *fileName=[upfile lastPathComponent];
     NSData *amrData = [NSData dataWithContentsOfFile:upfile];
     if(amrData==nil)
@@ -22,9 +21,8 @@ static NSString *PATH = @"/api/message/new";
         return;
     }
     HttpQuery *query = [self newQuery];
-    [query addParam:@"recipient" andValue:recipient];
-    [query addParam:@"subject" andValue:@"测试"];
+    [query addParam:@"body" andValue:fileName];
+    [query addParam:@"subject" andValue:subject];
     [self postWithPath:PATH andQuery:query andAttachments:[NSDictionary dictionaryWithObject:amrData forKey:fileName]];
 }
-
 @end

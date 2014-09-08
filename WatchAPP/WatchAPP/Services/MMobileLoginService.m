@@ -23,9 +23,6 @@ static NSString *PASSWORD = @"password";
     [query addParam:USERNAME andValue:username];
     [query addParam:PASSWORD andValue:password];
     
-    //[query addParam:USERNAME andValue:@"123"];
-    //[query addParam:PASSWORD andValue:@"123"];
-    
     [self postWithPath:PATH andQuery:query];
 }
 

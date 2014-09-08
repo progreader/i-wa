@@ -10,6 +10,8 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "lame.h"
 
+#import "UIScrollView+MJRefresh.h"
+
 //谷少鹏 20140904 导入音频文件格式转换的头文件
 #import "amrdl.h"
 @interface XHMessageTableViewController ()
@@ -654,9 +656,28 @@ static CGPoint  delayOffset = {0.0};
     // Do any additional setup after loading the view.    
     // 初始化消息页面布局
     [self initilzer];
+    [self.messageTableView addFooterWithTarget:self action:@selector(footerRereshing)];
     [[XHMessageBubbleView appearance] setFont:[UIFont systemFontOfSize:16.0f]];
 }
+-(void) footerRereshing{
+    if ([self.delegate respondsToSelector:@selector(shouldLoadMoreMessagesScrollToTop)]) {
+        BOOL shouldLoadMoreMessages = [self.delegate shouldLoadMoreMessagesScrollToTop];
+        if (shouldLoadMoreMessages) {
+            if (!self.loadingMoreMessage) {
+                if ([self.delegate respondsToSelector:@selector(loadMoreMessagesScrollTotop)]) {
+                    [self.delegate loadMoreMessagesScrollTotop];
+                }
+            }
+        }
+    }
 
+}
+-(void) footerBeginRefreshing{
+    [self.messageTableView footerBeginRefreshing];
+}
+-(void) footerEndRefreshing{
+    [self.messageTableView footerEndRefreshing];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -692,15 +713,26 @@ static CGPoint  delayOffset = {0.0};
 #pragma mark - RecorderPath Helper Method
 
 - (NSString *)getRecorderPath {
-    NSString *recorderPath = nil;
-    NSDate *now = [NSDate date];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"yy-MMMM-dd";
-    recorderPath = [[NSString alloc] initWithFormat:@"%@/Documents/", NSHomeDirectory()];
-    dateFormatter.dateFormat = @"yyyy-MM-dd-hh-mm-ss";
-    recorderPath = [recorderPath stringByAppendingFormat:@"%@-MySound", [dateFormatter stringFromDate:now]];
+//    NSString *recorderPath = nil;
+//    NSDate *now = [NSDate date];
+//    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//    dateFormatter.dateFormat = @"yy-MMMM-dd";
+//    recorderPath = [[NSString alloc] initWithFormat:@"%@/Documents/", NSHomeDirectory()];
+//    dateFormatter.dateFormat = @"yyyy-MM-dd-hh-mm-ss";
+//    recorderPath = [recorderPath stringByAppendingFormat:@"%@-MySound", [dateFormatter stringFromDate:now]];
+//    return recorderPath;
+    NSString *recorderPath = recorderPath = [[NSString alloc] initWithFormat:@"%@/Documents/", NSHomeDirectory()];;
+    recorderPath=[recorderPath stringByAppendingPathComponent:self.memberDataItem[@"OID"]];
+    BOOL isDir=YES;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:recorderPath isDirectory:&isDir] == NO) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:recorderPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+
+    long now=[[NSDate date] timeIntervalSince1970];
+    recorderPath = [recorderPath stringByAppendingPathComponent:[[NSString alloc ]initWithFormat:@"%ld",now]];
     return recorderPath;
 }
+
 
 #pragma mark - UITextView Helper Method
 
@@ -950,11 +982,10 @@ static CGPoint  delayOffset = {0.0};
         //0140904 去除转mp3功能，改为转换amr格式**********
         
         // [self toMp3:self.voiceRecordHelper.recordPath mp3FilePath:[NSString stringWithFormat:@"%@.mp3", self.voiceRecordHelper.recordPath]];
-        
-        [self toAmr:self.voiceRecordHelper.recordPath amrFilePath:[NSString stringWithFormat:@"%@.amr", self.voiceRecordHelper.recordPath]];
-        //*************************************************
 
-        [weakSelf didSendMessageWithVoice:weakSelf.voiceRecordHelper.recordPath voiceDuration:weakSelf.voiceRecordHelper.recordDuration];
+        [self toAmr:self.voiceRecordHelper.recordPath amrFilePath:self.voiceRecordHelper.amrPath];
+          //*************************************************
+        [weakSelf didSendMessageWithVoice:weakSelf.voiceRecordHelper.amrPath voiceDuration:weakSelf.voiceRecordHelper.recordDuration];
     }];
 }
 
@@ -1128,11 +1159,6 @@ static CGPoint  delayOffset = {0.0};
         BOOL shouldLoadMoreMessages = [self.delegate shouldLoadMoreMessagesScrollToTop];
         if (shouldLoadMoreMessages) {
             if (scrollView.contentOffset.y >=0 && scrollView.contentOffset.y <= 44) {
-                if (!self.loadingMoreMessage) {
-                    if ([self.delegate respondsToSelector:@selector(loadMoreMessagesScrollTotop)]) {
-                        [self.delegate loadMoreMessagesScrollTotop];
-                    }
-                }
             }
         }
     }
@@ -1198,7 +1224,7 @@ static CGPoint  delayOffset = {0.0};
     messageTableViewCell.indexPath = indexPath;
     [messageTableViewCell configureCellWithMessage:message displaysTimestamp:displayTimestamp];
     [messageTableViewCell setBackgroundColor:tableView.backgroundColor];
-    
+   
     if ([self.delegate respondsToSelector:@selector(configureCell:atIndexPath:)]) {
         [self.delegate configureCell:messageTableViewCell atIndexPath:indexPath];
     }
@@ -1275,7 +1301,7 @@ static CGPoint  delayOffset = {0.0};
 #pragma wav转换为amr格式
 - (BOOL)toAmr:(NSString *)wavFilePath amrFilePath:(NSString*)amrFilePath
 {
-  return [amrdl wavToAmr:[wavFilePath stringByAppendingPathExtension:@"wav" ] savePath:amrFilePath];
+  return [amrdl wavToAmr:wavFilePath savePath:amrFilePath];
 }
 
 - (void)convertMp3Finish

@@ -21,5 +21,7 @@
 
     // Configure the view for the selected state
 }
-
+-(void)setImageView:(NSString *)imageUrl{
+    
+}
 @end

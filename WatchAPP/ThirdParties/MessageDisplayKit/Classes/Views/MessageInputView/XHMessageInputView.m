@@ -359,6 +359,10 @@
         self.inputTextView.alpha = 0;
         self.holdDownButton.alpha = 1;
         self.voiceChangeButton.selected = YES;
+        
+        //谷少鹏 0906 只允许发送语音时，其他都不显示
+        self.multiMediaSendButton.alpha=0;
+        self.voiceChangeButton.alpha=0;
     }
     
     // 如果是可以发送语言的，那就需要一个按钮录音的按钮，事件可以在外部添加
