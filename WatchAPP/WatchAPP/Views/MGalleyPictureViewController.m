@@ -37,6 +37,9 @@
     [self.imageView sd_setImageWithURL:[NSURL URLWithString:self.iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
     
     self.scrollView.delegate=self;
+    self.scrollView.maximumZoomScale = 2.0;
+    self.scrollView.minimumZoomScale = 1.0;
+    self.scrollView.zoomScale = self.scrollView.minimumZoomScale;
 }
 
 - (void)didReceiveMemoryWarning
@@ -66,6 +69,16 @@
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
     return self.imageView;
+}
+
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView
+{
+	NSLog(@"scrollView.zoomScale:%f",scrollView.zoomScale);
+}
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+	CGPoint offset = scrollView.contentOffset;
+	NSLog(@"ImageScrollView offset.x:%f",offset.x);
 }
 
 @end
