@@ -13,6 +13,7 @@
 #import "UIImageView+WebCache.h"
 #import "MApi.h"
 #import "MRequesPictureListService.h"
+#import "UIImage+Resize.h"
 
 static const int KCountPerRow=4;
 
@@ -139,7 +140,9 @@ static const int KCountPerRow=4;
     
     NSString* iconUrl=[self.galleyDataItemList objectAtIndex:index];
     imageView.tag=index;
-    [imageView sd_setImageWithURL:[NSURL URLWithString:iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
+    [imageView sd_setImageWithURL:[NSURL URLWithString:iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]] placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+        imageView.image=[image thumbnailImage:imageView.bounds.size.width transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
+    }];
     
     if([imageView gestureRecognizers].count==0)
     {

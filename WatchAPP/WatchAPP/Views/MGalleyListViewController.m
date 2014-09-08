@@ -82,9 +82,15 @@
     [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     id memberdata=self.members[indexPath.row];
     id membername=memberdata[@"member_name"];
+    id nickname=memberdata[@"$person"][@"nickname"];
     id iconUrl=memberdata[@"$person"][@"avatar_url"];
     
-    cell.monthTextLabel.text = membername;
+    if([nickname isEqualToString:@"None"])
+    {
+        nickname=[NSString stringWithFormat:@"(%@)",membername];
+    }
+    
+    cell.monthTextLabel.text = nickname;
     [cell.galleyImageView sd_setImageWithURL:[NSURL URLWithString:iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
     
     return cell;

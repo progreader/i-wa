@@ -253,6 +253,7 @@ supportHomeResourceService;
                 [supportPersonNames addObject:personName];
             }
 
+            [dic setObject:userId forKey:@"userId"];
             if(supportPersonNames)
             {
                 [dic setObject:supportPersonNames forKey:@"supportPersonNames"];
@@ -480,16 +481,25 @@ supportHomeResourceService;
 
 - (void)didOnCommentImageButtonTapped:(id)sender
 {
-    MGalleyListViewController *viewController = [MGalleyListViewController new];
-    [self.navigationController pushViewController:viewController animated:YES];
+    UIButton *button = sender;
+    NSMutableDictionary *dataItem = [self.timelineItemList objectAtIndex:button.tag];
+    NSString* userId=dataItem[@"userId"];
     
-    //MGalleyViewController *viewController2 = [MGalleyViewController new];
-    //[self.navigationController pushViewController:viewController2 animated:YES];
+    MGalleyViewController *viewController = [MGalleyViewController new];
+    viewController.personId=userId;
+
+    [self.navigationController pushViewController:viewController animated:YES];
 }
 
 - (void)didOnMemberImageButtonTapped:(id)sender
 {
-    MGalleyListViewController *viewController = [MGalleyListViewController new];
+    UIButton *button = sender;
+    NSMutableDictionary *dataItem = [self.timelineItemList objectAtIndex:button.tag];
+    NSString* userId=dataItem[@"userId"];
+    
+    MGalleyViewController *viewController = [MGalleyViewController new];
+    viewController.personId=userId;
+    
     [self.navigationController pushViewController:viewController animated:YES];
 }
 
