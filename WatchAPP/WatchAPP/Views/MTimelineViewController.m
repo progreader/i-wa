@@ -29,6 +29,7 @@
 #import "SDWebImageManager.h"
 #import "UIImageView+WebCache.h"
 #import "MJRefresh.h"
+#import "UIImage+Resize.h"
 
 static const int KImageViewTag=100;
 
@@ -37,6 +38,7 @@ static const int KImageViewTag=100;
     BOOL isRefresh_;
     BOOL isSubmitSupport_;
     __weak UIButton* curSupportButton_;
+    NSCache* cache_;
 }
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -129,6 +131,8 @@ supportHomeResourceService;
     }];
     
     [self performSelector:@selector(handleSendSuccess) withObject:nil afterDelay:1.0];
+    
+    cache_=[[NSCache alloc] init];
 }
 
 -(void)requestRefresh
@@ -627,8 +631,21 @@ supportHomeResourceService;
         }
         
         NSString *imageUrl = dataItem[@"IMAGE_URL"];
-        [imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
-        
+        UIImage* image=[cache_ objectForKey:imageUrl];
+        if(image)
+        {
+            imageView.image=image;
+        }
+        else
+        {
+            NSURL* URL=[NSURL URLWithString:imageUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]];
+            [imageView sd_setImageWithURL:URL placeholderImage:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                
+                image=[image thumbnailImage:imageView.bounds.size.width transparentBorder:0 cornerRadius:0 interpolationQuality:kCGInterpolationLow];
+                imageView.image=image;
+                [cache_ setObject:image forKey:imageUrl];
+            }];
+        }
         //[cell.commentImageButton setImage:[UIImage imageNamed:imageUrl] forState:UIControlStateNormal];
 
         y += 145;
