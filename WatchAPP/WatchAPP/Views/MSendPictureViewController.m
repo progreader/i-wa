@@ -59,7 +59,7 @@ MWaitingDialogViewController * waitingDialogViewController;
 {
     [self.view endEditing:YES];
     
-    NSData* imageData=UIImageJPEGRepresentation(self.pickedImage,0.65);
+    NSData* imageData=UIImageJPEGRepresentation(self.pickedImage,0.50);
     NSString* content=self.textView.text;
     
     if(!imageData && content.length==0)
