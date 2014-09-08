@@ -207,7 +207,7 @@ supportHomeResourceService;
             NSString* from=@"";//WATCH
             NSString* actionType=@"HEART";
             NSString* createByUserName=@"";
-            double timestamp=[[[objDic objectForKey:@"created_at"] objectForKey: @"$date"] doubleValue];
+            double timestamp=[[[objDic objectForKey:@"created_at"] objectForKey: @"$date"] doubleValue]/1000-8*60*60;
             NSString* time=[[self class] dateTimeStringWithTimeIntervalSince1970:timestamp dateTimeFormat:@"MM-dd hh:mm"];
             NSString* comment=[objDic objectForKey:@"body"];
             NSString* imgUrl=[objDic objectForKey:@"url"];
