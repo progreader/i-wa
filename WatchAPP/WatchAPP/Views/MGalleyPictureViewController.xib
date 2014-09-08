@@ -8,6 +8,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MGalleyPictureViewController">
             <connections>
                 <outlet property="imageView" destination="kgy-ve-lId" id="qZM-Td-ZTo"/>
+                <outlet property="scrollView" destination="3od-Iu-9gS" id="de8-jg-Z0t"/>
                 <outlet property="view" destination="pie-29-FBh" id="WUy-iC-9Oz"/>
             </connections>
         </placeholder>

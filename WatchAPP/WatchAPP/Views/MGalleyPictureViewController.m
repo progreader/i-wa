@@ -12,8 +12,10 @@
 #import "UIImageView+WebCache.h"
 #import "MApi.h"
 
-@interface MGalleyPictureViewController ()
+@interface MGalleyPictureViewController ()<UIScrollViewDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+
 @end
 
 @implementation MGalleyPictureViewController
@@ -33,6 +35,8 @@
     // Do any additional setup after loading the view from its nib.
     
     [self.imageView sd_setImageWithURL:[NSURL URLWithString:self.iconUrl relativeToURL:[NSURL URLWithString:[MApi getBaseUrl]]]];
+    
+    self.scrollView.delegate=self;
 }
 
 - (void)didReceiveMemoryWarning
@@ -55,6 +59,13 @@
         }];
         
     }];
+}
+
+#pragma mark -
+#pragma mark UIScrollViewDelegate
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+    return self.imageView;
 }
 
 @end

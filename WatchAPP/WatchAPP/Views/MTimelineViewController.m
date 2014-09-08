@@ -196,7 +196,14 @@ supportHomeResourceService;
         
         for (NSDictionary* objDic in objs)
         {
+            NSString* mediaUrl=[objDic objectForKey:@"url"];
+            if([mediaUrl hasSuffix:@".amr"])
+            {
+                continue;
+            }
+            
             NSMutableDictionary* dic=[NSMutableDictionary dictionaryWithCapacity:10];
+
             NSDictionary* createByDic=[objDic objectForKey:@"$created_by"];
             
             NSString* userId=[[createByDic objectForKey:@"_id"] objectForKey:@"$oid"];
@@ -210,8 +217,7 @@ supportHomeResourceService;
             double timestamp=[[[objDic objectForKey:@"created_at"] objectForKey: @"$date"] doubleValue]/1000-8*60*60;
             NSString* time=[[self class] dateTimeStringWithTimeIntervalSince1970:timestamp dateTimeFormat:@"MM-dd hh:mm"];
             NSString* comment=[objDic objectForKey:@"body"];
-            NSString* imgUrl=[objDic objectForKey:@"url"];
-            
+ 
             NSString* REPLY_LIST=nil;
    
             NSMutableDictionary* memberDic=[NSMutableDictionary dictionaryWithCapacity:5];
@@ -277,9 +283,9 @@ supportHomeResourceService;
                 [dic setObject:comment forKey:@"COMMENT"];
             }
             
-            if(imgUrl)
+            if(mediaUrl)
             {
-                [dic setObject:imgUrl forKey:@"IMAGE_URL"];
+                [dic setObject:mediaUrl forKey:@"IMAGE_URL"];
             }
             if(issupport)
             {
